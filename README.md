@@ -4,7 +4,7 @@ An Extremely Low Friction (ELF) AWS IoT python example client
 
 ## Overview
 
-The **AWS IoT ELF** python example client provides an extremely low friction example of how one can **Create** Things, **Send** messages to Things, and **Clean** up Things in the AWS IoT service.
+The **AWS IoT ELF** python example client is an example of how one can **Create** Things, **Send** messages to Things, and **Clean** up Things in the AWS IoT service.
 
 #### Create Thing(s)
 Once the AWS Iot ELF is configured, to create a single Thing in the AWS IoT service, simply type:
@@ -48,12 +48,11 @@ When you configure the AWS CLI, the API Keys you install as the default profile 
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Sid": "Stmt1464723918000",
+            "Sid": "ELFStmt20160531",
             "Effect": "Allow",
             "Action": [
                 "iot:AttachPrincipalPolicy",
                 "iot:AttachThingPrincipal",
-                "iot:Connect",
                 "iot:CreateKeysAndCertificate",
                 "iot:CreatePolicy",
                 "iot:CreateThing",
@@ -65,10 +64,7 @@ When you configure the AWS CLI, the API Keys you install as the default profile 
                 "iot:DescribeEndpoint",
                 "iot:DetachPrincipalPolicy",
                 "iot:DetachThingPrincipal",
-                "iot:Publish",
-                "iot:Receive",
                 "iot:ReplaceTopicRule",
-                "iot:Subscribe",
                 "iot:UpdateCertificate",
                 "iot:UpdateThing"
             ],
