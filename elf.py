@@ -17,7 +17,6 @@ from random import choice
 from string import lowercase
 import paho.mqtt.client as paho
 
-# TODO clean-up thing policy
 
 log = logging.getLogger('aws-elf')
 # log.setLevel(logging.DEBUG)
