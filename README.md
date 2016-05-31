@@ -4,7 +4,7 @@ An Extremely Low Friction (ELF) AWS IoT python example client
 
 ## Overview
 
-The **AWS IoT ELF** python example client is an example of how one can **Create** Things, **Send** messages to Things, and **Clean** up Things in the AWS IoT service using the AWS SDK for Python. *(This is not now nor in the future to be a replacement for the AWS CLI)*
+The **AWS IoT ELF** python example client is an example of how one can **Create** Things, **Send** messages to Things, and **Clean** up Things in the AWS IoT service using the AWS SDK for Python. *(This is not to be a replacement for the AWS CLI)*
 
 #### Create Thing(s)
 Once the AWS IoT ELF's *getting started* is complete, to create a single Thing in the AWS IoT service, simply type:
