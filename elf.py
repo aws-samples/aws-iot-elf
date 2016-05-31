@@ -17,16 +17,14 @@ from random import choice
 from string import lowercase
 import paho.mqtt.client as paho
 
+# TODO clean-up thing policy
 
-# TODO create things
-# TODO generate messages against created things
-# TODO clean-up things
 log = logging.getLogger('aws-elf')
-log.setLevel(logging.DEBUG)
-# log.setLevel(logging.INFO)
+# log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 ch = logging.StreamHandler()
-# ch.setLevel(logging.INFO)
-ch.setLevel(logging.DEBUG)
+ch.setLevel(logging.INFO)
+# ch.setLevel(logging.DEBUG)
 formatter = logging.Formatter(
     '%(asctime)s:%(name)s:%(levelname)s - %(message)s')
 formatter.converter = time.gmtime  # switch to a UTC converter for the format
@@ -100,7 +98,7 @@ def _get_things_config():
             with open(things_file, "r") as in_file:
                 things = json.load(in_file)
         except OSError as ose:
-            log.error('OSError while reading Elf thing config file. {0}'.format(
+            log.error('OSError while reading ELF thing config file. {0}'.format(
                 ose))
     return things
 
@@ -121,9 +119,9 @@ def _update_elf_config(cfg):
     try:
         with open(filename, "w") as out_file:
             json.dump(cfg, out_file)
-            log.debug("Wrote Elf config to file: {0}".format(cfg))
+            log.debug("Wrote ELF config to file: {0}".format(cfg))
     except OSError:
-        log.error('OSError while writing Elf config file. {0}'.format(ose))
+        log.error('OSError while writing ELF config file. {0}'.format(ose))
 
 
 def _get_elf_config():
@@ -134,11 +132,20 @@ def _get_elf_config():
             with open(filename, "r") as in_file:
                 elf = json.load(in_file)
         except OSError as ose:
-            log.error('OSError while reading Elf config file. {0}'.format(ose))
+            log.error('OSError while reading ELF config file. {0}'.format(ose))
     return elf
 
 
-def _create_and_attach_policy(region, topic, thing_name, thing_cert_arn):
+def _get_iot_session(region, profile_name):
+    if profile_name is None:
+        return Session(region_name=self.region).client('iot')
+
+    return Session(
+        region_name=region,
+        profile_name=profile_name).client('iot')
+
+
+def _create_and_attach_policy(region, topic, thing_name, thing_cert_arn, cli):
     tp = {
         "Version": "2012-10-17",
         "Statement": [{
@@ -173,7 +180,7 @@ def _create_and_attach_policy(region, topic, thing_name, thing_cert_arn):
     #     ]
     # }
 
-    iot = Session(region_name=region).client('iot')
+    iot = _get_iot_session(region, cli.profile_name)
     policy_name = 'policy-{0}'.format(thing_name)
     policy = json.dumps(tp)
     log.debug('[_create_and_attach_policy] policy:{0}'.format(policy))
@@ -210,11 +217,13 @@ class ElfPoster(threading.Thread):
         self.region = cli.region
         self.cfg = cfg
         self.post_duration = cli.duration
-        self.aws_iot = Session(region_name=self.region).client('iot')
+        self.aws_iot = _get_iot_session(self.region, cli.profile_name)
+
         if policy_name_key not in thing.keys():
             policy_name, policy_arn = _create_and_attach_policy(
                 self.region, self.topic,
-                self.thing_name, self.thing['certificateArn']
+                self.thing_name, self.thing['certificateArn'],
+                cli
             )
             self.policy_name = policy_name
             self.policy_arn = policy_arn
@@ -229,7 +238,7 @@ class ElfPoster(threading.Thread):
         # setup MQTT client
         elf_id = uuid.UUID(cfg[elf_id_key])
 
-        # use Elf ID and a random string since we must use unique Client ID per
+        # use ELF ID and a random string since we must use unique Client ID per
         # client.
         cid = elf_id.urn.split(":")[2] + "_" + make_string(3)
 
@@ -279,7 +288,7 @@ class ElfPoster(threading.Thread):
         while finish > datetime.datetime.now():
             time.sleep(1)
             thing_topic = '{0}/{1}'.format(self.topic, self.thing_name)
-            log.info("Elf {0} posting message:'{1}' on topic: {2}".format(
+            log.info("ELF {0} posting message:'{1}' on topic: {2}".format(
                 self.thing_name, self.message, thing_topic))
             self.mqttc.publish(thing_topic, "{0} {1}".format(
                 time.time(), self.message))
@@ -290,12 +299,12 @@ def _init(cli):
     elf = _get_elf_config()
     if elf:
         elf_id = uuid.UUID(elf[elf_id_key])
-        log.info("Read Elf ID from config: {0}".format(elf_id))
-    else:  # file does not exist, so create our Elf ID
+        log.info("Read ELF ID from config: {0}".format(elf_id))
+    else:  # file does not exist, so create our ELF ID
         elf_id = uuid.uuid4()
         out_item = {elf_id_key: elf_id.urn}
         _update_elf_config(out_item)
-        log.info("Wrote Elf ID to config: {0}".format(out_item[elf_id_key]))
+        log.info("Wrote ELF ID to config: {0}".format(out_item[elf_id_key]))
 
 
 def create_things(cli):
@@ -304,16 +313,16 @@ def create_things(cli):
     '''
     _init(cli)
     region = cli.region
-    iot = Session(region_name=region).client('iot')
+    iot = _get_iot_session(region, cli.profile_name)
     count = cli.thing_count
     things = list()
     if certs_exist():
         return
 
     if count == 0 or count > 1:
-        log.info("[create_things] Elf creating {0} things".format(count))
+        log.info("[create_things] ELF creating {0} things".format(count))
     else:
-        log.info("[create_things] Elf creating {0} thing".format(count))
+        log.info("[create_things] ELF creating {0} thing".format(count))
 
     i = 0
     while i < count:
@@ -357,18 +366,18 @@ def create_things(cli):
 
             _update_things_config(things)
         except OSError as ose:
-            log.error('OSError while writing an Elf file. {0}'.format(ose))
+            log.error('OSError while writing an ELF file. {0}'.format(ose))
         i += 1
         # end 'while' - if there's more, do it all again
 
     log.info(
-        "[create_things] Elf created {0} things in region:'{1}'.".format(
+        "[create_things] ELF created {0} things in region:'{1}'.".format(
             i, region))
 
 
 def send_messages(cli):
     _init(cli)
-    iot = Session(region_name=cli.region).client('iot')
+    iot = _get_iot_session(cli.region, cli.profile_name)
 
     message = cli.message
     # root_cert = args.root_cert
@@ -376,13 +385,13 @@ def send_messages(cli):
     duration = cli.duration
     # region = args.region
     log.info(
-        "[send_messages] Elf sending:'{0}' on topic:'{1}' for:{2} secs".format(
+        "[send_messages] ELF sending:'{0}' on topic:'{1}' for:{2} secs".format(
             message, topic, duration))
 
     cfg = _get_elf_config()
     things = _get_things_config()
     if not things:
-        log.info("[send_messages] Elf couldn't find previously created things.")
+        log.info("[send_messages] ELF couldn't find previously created things.")
         return
 
     # setup Things and ElfPosters
@@ -409,8 +418,8 @@ def send_messages(cli):
 
 def clean_up(cli):
     _init(cli)
-    log.info("[clean_up] Elf is cleaning up...")
-    iot = Session(region_name=cli.region).client('iot')
+    log.info("[clean_up] ELF is cleaning up...")
+    iot = _get_iot_session(cli.region, cli.profile_name)
     only_local = cli.only_local
 
     if not only_local:
@@ -502,7 +511,7 @@ def clean_up(cli):
             log.debug("[clean_up] File found: {0}".format(f))
             os.remove(path + '/' + f)
 
-    log.info("[clean_up] Elf has completed cleaning up in region:{0}".format(
+    log.info("[clean_up] ELF has completed cleaning up in region:{0}".format(
         cli.region))
 
 
@@ -513,6 +522,8 @@ if __name__ == '__main__':
 
     parser.add_argument('--region', dest='region', help='The AWS region to use.',
                         default='us-west-2')
+    parser.add_argument('--profile', dest='profile_name',
+                        help='The AWS CLI profile to use.')
     subparsers = parser.add_subparsers()
 
     create = subparsers.add_parser(
@@ -525,7 +536,7 @@ if __name__ == '__main__':
     send = subparsers.add_parser(
         'send',
         description='Send the given message from each created Thing to the topic.')
-    send.add_argument('message', nargs='?', default="IoT Elf Hello",
+    send.add_argument('message', nargs='?', default="IoT ELF Hello",
                       help="The message each Thing will send.")
     send.add_argument('--root-cert', dest='root_cert',
                       default="aws-iot-rootCA.crt",
@@ -542,7 +553,7 @@ if __name__ == '__main__':
     clean.set_defaults(func=clean_up)
     clean.add_argument('--force', '--only-local', dest='only_local',
                        action='store_true',
-                       help='Force clean the locally stored Elf files.')
+                       help='Force clean the locally stored ELF files.')
 
     args = parser.parse_args()
     args.func(args)
