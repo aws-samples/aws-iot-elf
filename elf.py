@@ -23,7 +23,7 @@ log = logging.getLogger('aws-elf')
 # log.setLevel(logging.DEBUG)
 log.setLevel(logging.INFO)
 ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)
+# ch.setLevel(logging.INFO)
 # ch.setLevel(logging.DEBUG)
 formatter = logging.Formatter(
     '%(asctime)s:%(name)s:%(levelname)s - %(message)s')
@@ -41,31 +41,8 @@ elf_id_key = "elf_id"
 elf_id = None
 policy_name_key = "elf_policy"
 policy_arn_key = "elf_policy_arn"
-thing_name_template = "elf-thing-{0}"
+thing_name_template = "thing_{0}"
 
-thing_policy = {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "iot:Connect"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "iot:Publish"
-            ],
-            "Resource": [
-                "arn:aws:iot:{0}:*:topic/{1}/{2}"
-            ]
-        }
-    ]
-}
 
 make_string = lambda x: "".join(choice(lowercase) for i in range(x))
 
@@ -138,47 +115,35 @@ def _get_elf_config():
 
 def _get_iot_session(region, profile_name):
     if profile_name is None:
-        return Session(region_name=self.region).client('iot')
+        log.debug("ELF loading AWS IoT client using 'default' AWS CLI profile")
+        return Session(region_name=region).client('iot')
 
+    log.debug("ELF loading AWS IoT client using '{0}' AWS CLI profile".format(
+        profile_name))
     return Session(
         region_name=region,
         profile_name=profile_name).client('iot')
 
 
 def _create_and_attach_policy(region, topic, thing_name, thing_cert_arn, cli):
+    # Create and attach to the principal/certificate the minimal privilege
+    # thing policy that allows publish and subscribe for the 'thing_name' Thing
     tp = {
         "Version": "2012-10-17",
         "Statement": [{
             "Effect": "Allow",
-            "Action": ["iot:*"],
-            # "Resource": ["*"]
-            "Resource": ["arn:aws:iot:*:*:*"]
+            "Action": [
+                # "iot:*"
+                "iot:Connect",
+                "iot:Publish",
+                "iot:Receive",
+                "iot:Subscribe"
+            ],
+            "Resource": [
+                "arn:aws:iot:{0}:*:*".format(region)
+            ]
         }]
     }
-    # tp = {
-    #     "Version": "2012-10-17",
-    #     "Statement": [
-    #         {
-    #             "Effect": "Allow",
-    #             "Action": [
-    #                 "iot:Connect"
-    #             ],
-    #             "Resource": [
-    #                 "*"
-    #             ]
-    #         },
-    #         {
-    #             "Effect": "Allow",
-    #             "Action": [
-    #                 "iot:Publish"
-    #             ],
-    #             "Resource": [
-    #                 "arn:aws:iot:{0}:*:{1}/{2}".format(
-    #                     region, topic, thing_name)
-    #             ]
-    #         }
-    #     ]
-    # }
 
     iot = _get_iot_session(region, cli.profile_name)
     policy_name = 'policy-{0}'.format(thing_name)
@@ -210,7 +175,7 @@ class ElfPoster(threading.Thread):
             name=thing_name, args=args, kwargs=kwargs
         )
         self.thing_name = thing_name
-        self.message = "{0}: {1}".format(thing_name, cli.message)
+        self.message = cli.message
         self.thing = thing
         self.root_cert = cli.root_cert
         self.topic = cli.topic
@@ -249,6 +214,9 @@ class ElfPoster(threading.Thread):
         self.mqttc.on_disconnect = self.on_disconnect
         self.mqttc.on_log = self.on_log
         self.mqttc.on_message = self.on_message
+
+        # Setup the correct certificates and protocol version to communicate
+        # with AWS IoT
         self.mqttc.tls_set(
             ca_certs=self.root_cert,
             certfile=t_name + ".pem",
@@ -256,6 +224,8 @@ class ElfPoster(threading.Thread):
             tls_version=ssl.PROTOCOL_TLSv1_2
         )
         endpoint = self.aws_iot.describe_endpoint()
+        log.info("ELF connecting asynchronously to IoT endpoint:'{0}'".format(
+            endpoint['endpointAddress']))
         self.mqttc.connect_async(
             host=endpoint['endpointAddress'],
             port=AWS_IOT_MQTT_PORT,
@@ -264,7 +234,7 @@ class ElfPoster(threading.Thread):
         time.sleep(1)
         self.mqttc.loop_start()
 
-    # The callback for when a PUBLISH message is received from the server.
+    # The callback used when a PUBLISH message is received from the server.
     def on_message(self, mqttc, userdata, msg):
         log.info("[on_message] {0}: topic:{1} msg:{2}".format(
             self.thing_name, msg.topic, str(msg.payload)))
@@ -275,7 +245,7 @@ class ElfPoster(threading.Thread):
         self.mqttc.subscribe("$aws/events/#")
 
     def on_disconnect(self, mqttc, userdata, rc):
-        log.debug("[on_disconnect] {0}: Disconnected result: {2}".format(
+        log.info("[on_disconnect] {0}: Disconnected result: {2}".format(
             self.thing_name, userdata, rc))
 
     def on_log(self, mqttc, userdata, level, msg):
@@ -286,15 +256,22 @@ class ElfPoster(threading.Thread):
         start = datetime.datetime.now()
         finish = start + datetime.timedelta(seconds=self.post_duration)
         while finish > datetime.datetime.now():
-            time.sleep(1)
+            time.sleep(1)  # wait a second between publishing iterations
             thing_topic = '{0}/{1}'.format(self.topic, self.thing_name)
+            msg = {
+                "ts": "{0}".format(time.time()),
+                "msg": "{0}".format(self.message)
+            }
+
             log.info("ELF {0} posting message:'{1}' on topic: {2}".format(
-                self.thing_name, self.message, thing_topic))
-            self.mqttc.publish(thing_topic, "{0} {1}".format(
-                time.time(), self.message))
+                self.thing_name, msg, thing_topic))
+            # publish a JSON equivalent of this Thing's message with a
+            # timestamp
+            self.mqttc.publish(thing_topic, json.dumps(msg))
 
 
 def _init(cli):
+    # Initialize local configuration file and ELF's unique ID
     elf_id = None
     elf = _get_elf_config()
     if elf:
@@ -309,7 +286,7 @@ def _init(cli):
 
 def create_things(cli):
     '''
-    Create and activate a specified number of things in the AWS IoT Service.
+    Create and activate a specified number of Things in the AWS IoT Service.
     '''
     _init(cli)
     region = cli.region
@@ -376,6 +353,10 @@ def create_things(cli):
 
 
 def send_messages(cli):
+    '''
+    Send messages through the AWS IoT service from the previously created 
+    number of Things.
+    '''
     _init(cli)
     iot = _get_iot_session(cli.region, cli.profile_name)
 
@@ -394,7 +375,7 @@ def send_messages(cli):
         log.info("[send_messages] ELF couldn't find previously created things.")
         return
 
-    # setup Things and ElfPosters
+    # setup Things and ElfPoster threads
     i = 0
     ep_list = list()
     for t in things:
@@ -411,12 +392,16 @@ def send_messages(cli):
 
     _update_things_config(things)
 
-    # wait for all the ElfPosters to finish their post_duration
+    # wait for all the ElfPoster threads to finish their post_duration
     for ep in ep_list:
         ep.join()
 
 
 def clean_up(cli):
+    '''
+    Clean up all Things previously created in the AWS IoT Service and files 
+    stored locally.
+    '''
     _init(cli)
     log.info("[clean_up] ELF is cleaning up...")
     iot = _get_iot_session(cli.region, cli.profile_name)
