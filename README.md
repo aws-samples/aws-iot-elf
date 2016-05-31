@@ -4,7 +4,7 @@ An Extremely Low Friction (ELF) AWS IoT python example client
 
 ## Overview
 
-The **AWS IoT ELF** python example client provides an extremely low friction example of how one can **create** Things, **send** messages to Things, and **clean** up Things in the AWS IoT service.
+The **AWS IoT ELF** python example client provides an extremely low friction example of how one can **Create** Things, **Send** messages to Things, and **Clean** up Things in the AWS IoT service.
 
 #### Create Thing(s)
 Once the AWS Iot ELF is configured, to create a single Thing in the AWS IoT service, simply type:
@@ -42,7 +42,43 @@ $ pip install -r requirements.txt
 ````
 Next, [install](http://docs.aws.amazon.com/cli/latest/userguide/installing.html) and [configure](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html) the AWS CLI.
 
-When you configure the AWS CLI, the API Keys you install as the default profile or a [named profile](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-multiple-profiles) should have at least the following privileges [[tbd delineation]].
+When you configure the AWS CLI, the API Keys you install as the default profile or a [named profile](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-multiple-profiles) should have at least the following privileges in an associated policy:
+````
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Stmt1464723918000",
+            "Effect": "Allow",
+            "Action": [
+                "iot:AttachPrincipalPolicy",
+                "iot:AttachThingPrincipal",
+                "iot:Connect",
+                "iot:CreateKeysAndCertificate",
+                "iot:CreatePolicy",
+                "iot:CreateThing",
+                "iot:CreateTopicRule",
+                "iot:DeleteCertificate",
+                "iot:DeletePolicy",
+                "iot:DeleteThing",
+                "iot:DeleteTopicRule",
+                "iot:DescribeEndpoint",
+                "iot:DetachPrincipalPolicy",
+                "iot:DetachThingPrincipal",
+                "iot:Publish",
+                "iot:Receive",
+                "iot:ReplaceTopicRule",
+                "iot:Subscribe",
+                "iot:UpdateCertificate",
+                "iot:UpdateThing"
+            ],
+            "Resource": [
+                "*"
+            ]
+        }
+    ]
+}
+````
 
 Lastly, to [Authenticate with AWS IoT](http://docs.aws.amazon.com/iot/latest/developerguide/identity-in-iot.html) using Server Authentication you will need to download the [Verisign root CA](https://www.symantec.com/content/en/us/enterprise/verisign/roots/VeriSign-Class%203-Public-Primary-Certification-Authority-G5.pem) and save it as a file `aws-iot-rootCA.crt`, or simply execute this command in the same directory as `elf.py`.
 ````
@@ -54,6 +90,11 @@ curl -o aws-iot-rootCA.crt https://www.symantec.com/content/en/us/enterprise/ver
 To create a given number of Things (eg. `3`) in the AWS IoT service in a specific region, type:
 ````
 (venv)$ python elf.py --region <region_name> create 3
+````
+
+To create a single Thing in the AWS IoT service using a different AWS CLI profile, type:
+````
+(venv)$ python elf.py --profile elf create
 ````
 
 #### Send Messages
@@ -74,13 +115,12 @@ For additional detailed help and configuration options, enter:
 (venv)$ python elf.py --help
 ..or..
 (venv)$ python elf.py create --help
-..or...
 (venv)$ python elf.py send --help
 (venv)$ python elf.py clean --help
 ````
 
 ## Troubleshooting
-*Q:* When I try to send messages, I see a `ResourceAlreadyExistsException` exception similar to the following. What could be wrong?
+**Q:** When I try to send messages, I see a `ResourceAlreadyExistsException` exception similar to the following. What could be wrong?
 ````
 ...example...
   File "elf.py", line 182, in _create_and_attach_policy
@@ -91,7 +131,20 @@ For additional detailed help and configuration options, enter:
     raise ClientError(parsed_response, operation_name)
 botocore.exceptions.ClientError: An error occurred (ResourceAlreadyExistsException) when calling the CreatePolicy operation: Policy cannot be created - name already exists (name=policy-elf-thing-0)
 ````
-*A:* Using the example exception above, the policy `policy-elf-thing-0` already exists. For some reason the policy name exists and is colliding with the new policy being created and applied to the Thing. This old policy needs to be Detached and Deleted manually using the AWS IoT Console or AWS CLI. 
+**A:** In this example exception, for some reason the policy name `policy-elf-thing-0` already exists and is colliding with the new policy being created and applied to the Thing. The old existing policy needs to be [Detached](http://docs.aws.amazon.com/cli/latest/reference/iot/detach-principal-policy.html) and [Deleted](http://docs.aws.amazon.com/cli/latest/reference/iot/delete-policy.html) manually using the AWS CLI or AWS IoT Console. 
+
+**Q:** When I try to `create`, `send`, or `clean`, I see an `AccessDeniedException` exception similar to the following. What could be wrong?
+````
+...example...
+File "elf.py", line 330, in create_things
+    keys_cert = iot.create_keys_and_certificate(setAsActive=True)
+  File "/Users/brettf/dev/iot/bites/aws-iot-elf/venv/lib/python2.7/site-packages/botocore/client.py", line 258, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+  File "/Users/brettf/dev/iot/bites/aws-iot-elf/venv/lib/python2.7/site-packages/botocore/client.py", line 548, in _make_api_call
+    raise ClientError(parsed_response, operation_name)
+botocore.exceptions.ClientError: An error occurred (AccessDeniedException) when calling the CreateKeysAndCertificate operation: User: arn:aws:iam::XXXXXXYYYYYY:user/elf is not authorized to perform: iot:CreateKeysAndCertificate
+````
+**A:** In this example exception, the user `elf` does not have enough privilege to perform the `iot:CreateKeysAndCertificate` action on the AWS IoT service. Make sure the privileges as described in the *Getting Started* section are associated with the user (and specifically API keys) experiencing the exception.
 
 Related Resources
 -----------------
