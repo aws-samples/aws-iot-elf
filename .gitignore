@@ -46,3 +46,4 @@ misc
 *.pem
 *.prv
 *.crt
+*.tok
