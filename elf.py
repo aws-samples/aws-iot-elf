@@ -18,7 +18,7 @@ from string import lowercase
 import paho.mqtt.client as paho
 
 
-log = logging.getLogger('aws-elf')
+log = logging.getLogger('iot-elf')
 # log.setLevel(logging.DEBUG)
 log.setLevel(logging.INFO)
 ch = logging.StreamHandler()
