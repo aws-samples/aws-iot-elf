@@ -85,9 +85,9 @@ curl -o aws-iot-rootCA.crt https://www.symantec.com/content/en/us/enterprise/ver
 #### Defaults
 The AWS IoT ELF uses the following defaults:
 - region: `us-west-2`
-- MQTT topic: `elf`
+- MQTT topic: `elf/<thing_#>`
 - message: `IoT ELF Hello`
-- send message duration: 10 seconds
+- send message duration: `10 seconds`
 
 #### Create Thing(s)
 Using the `clean` command will invoke the `create_things(cli)` function with the given command line arguments.
@@ -96,7 +96,7 @@ To create a given number of Things (eg. `3`) in the AWS IoT service in a specifi
 ````
 (venv)$ python elf.py --region <region_name> create 3
 ````
-This command results in three things: `thing_0`, `thing_1`, and `thing_2` being created in `<region_name>`.
+This command results in three numbered things: `thing_0`, `thing_1`, and `thing_2` being created in `<region_name>`.
 
 To create a single Thing in the AWS IoT service using a different AWS CLI profile, type:
 ````
@@ -109,6 +109,22 @@ To create a single Thing in the AWS IoT service in a specific region using a dif
 ````
 
 Calling the `create` command with a `--region` and/or `--profile` CLI option means that the Things will be created in that region and will use the corresponding AWS API Key and AWS Secret Key pair. Additional `send` and `clean` commands should use the same options. In this way the AWS IoT ELF will send messages to the same region and with the same profile used to `create` the Things in the first place. Once `clean` is called successfully, different `--region` and/or `--profile` option values can be used to orient the AWS IoT ELF differently.
+
+When looking through the `create_thing(cli)` function, the core of the `create` command are these lines of code:
+````
+...
+    # generate a numbered thing name
+    t_name = thing_name_template.format(i)
+    # Create a Key and Certificate in the AWS IoT Service per Thing
+    keys_cert = iot.create_keys_and_certificate(setAsActive=True)
+    # Create a named Thing in the AWS IoT Service
+    iot.create_thing(thingName=t_name)
+    # Attach the previously created Certificate to the created Thing
+    iot.attach_thing_principal(
+        thingName=t_name, principal=keys_cert['certificateArn'])
+...
+````
+Everything else around this code is to prepare for or record the results of the invocation of these functions.
 
 #### Send Messages
 Using the `send` command will invoke the `send_messages(cli)` function with the given command line arguments.
@@ -126,6 +142,34 @@ To force a clean up of only the local stored files, type:
 (venv)$ python elf.py clean --only-local
 ````
 
+When looking through the `clean_up(cli)` function, the core of the `clean` command are these lines of code:
+````
+...
+    iot.detach_principal_policy(
+        policyName=thing[policy_name_key],
+        principal=thing['certificateArn']
+    )
+..snip..
+    iot.delete_policy(
+        policyName=thing[policy_name_key]
+    )
+..snip..
+    iot.update_certificate(
+        certificateId=thing['certificateId'],
+        newStatus='INACTIVE'
+    )
+..snip..
+    iot.detach_thing_principal(
+        thingName=thing_name,
+        principal=thing['certificateArn']
+    )
+..snip..
+    iot.delete_certificate(certificateId=thing['certificateId'])
+..snip..
+    iot.delete_thing(thingName=thing_name)
+````
+All steps prior to `delete_thing` are required in order, to detach and clean up a fully functional and authorized Thing.
+
 #### Help
 For additional detailed help and configuration options, enter: 
 ````
@@ -140,16 +184,19 @@ For additional detailed help and configuration options, enter:
 **Q:** When I try to send messages, I see a `ResourceAlreadyExistsException` exception similar to the following. What might be wrong?
 ````
 ...example...
-botocore.exceptions.ClientError: An error occurred (ResourceAlreadyExistsException) when calling the CreatePolicy operation: Policy cannot be created - name already exists (name=policy-elf-thing-0)
+botocore.exceptions.ClientError: An error occurred (ResourceAlreadyExistsException) when calling the 
+CreatePolicy operation: Policy cannot be created - name already exists (name=policy-thing_0)
 ````
-**A:** In this example exception, for some reason the policy name `policy-elf-thing-0` already exists and is colliding with the new policy being created and applied to the Thing. The old existing policy needs to be [Detached](http://docs.aws.amazon.com/cli/latest/reference/iot/detach-principal-policy.html) and [Deleted](http://docs.aws.amazon.com/cli/latest/reference/iot/delete-policy.html) manually using the AWS CLI or AWS IoT Console. 
+**A:** In this example exception, for some reason the policy name `policy-thing_0` already exists and is colliding with the new policy to be created and applied to the Thing. The old existing policy needs to be [Detached](http://docs.aws.amazon.com/cli/latest/reference/iot/detach-principal-policy.html) and [Deleted](http://docs.aws.amazon.com/cli/latest/reference/iot/delete-policy.html) manually using the AWS CLI or AWS IoT Console. 
 
 **Q:** When I try to `create`, `send`, or `clean`, I see an `AccessDeniedException` exception similar to the following. What might be wrong?
 ````
 ...example...
-botocore.exceptions.ClientError: An error occurred (AccessDeniedException) when calling the CreateKeysAndCertificate operation: User: arn:aws:iam::XXXXXXYYYYYY:user/elf is not authorized to perform: iot:CreateKeysAndCertificate
+botocore.exceptions.ClientError: An error occurred (AccessDeniedException) when calling the 
+CreateKeysAndCertificate operation: User: arn:aws:iam::XXXXXXYYYYYY:user/elf is not 
+authorized to perform: iot:CreateKeysAndCertificate
 ````
-**A:** In this example exception, the user `elf` does not have enough privilege to perform the `iot:CreateKeysAndCertificate` action on the AWS IoT service. Make sure the privileges as described in the *Getting Started* section are associated with the user (and specifically API keys) experiencing the exception.
+**A:** In this example exception, the user `elf` does not have enough privilege to perform the `iot:CreateKeysAndCertificate` action on the AWS IoT service. Make sure the privileges as described in the *Getting Started* section are associated with the user or `--profile` (and specifically the API keys) experiencing the exception. 
 
 **Q:** When I try to `send` messages using my recently created Things, I see a `ResourceNotFoundException` similar to the following. What might be wrong?
 ````

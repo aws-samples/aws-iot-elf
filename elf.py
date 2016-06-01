@@ -302,6 +302,9 @@ def create_things(cli):
 
     i = 0
     while i < count:
+        ###
+        # This is portion of the loop is the core of the `create` command
+        # generate a numbered thing name
         t_name = thing_name_template.format(i)
         # Create a Key and Certificate in the AWS IoT Service per Thing
         keys_cert = iot.create_keys_and_certificate(setAsActive=True)
@@ -310,6 +313,9 @@ def create_things(cli):
         # Attach the previously created Certificate to the created Thing
         iot.attach_thing_principal(
             thingName=t_name, principal=keys_cert['certificateArn'])
+        # This is the end of the core of the `create` command
+        ###
+
         things.append({t_name: keys_cert})
         cert_arn = things[i][t_name]['certificateArn']
         log.info("Thing:'{0}' associated with cert:'{1}'".format(
