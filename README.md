@@ -110,7 +110,7 @@ To create a single Thing in the AWS IoT service in a specific region using a dif
 
 Calling the `create` command with a `--region` and/or `--profile` CLI option means that the Things will be created in that region and will use the corresponding AWS API Key and AWS Secret Key pair. Additional `send` and `clean` commands should use the same options. In this way the AWS IoT ELF will send messages to the same region and with the same profile used to `create` the Things in the first place. Once `clean` is called successfully, different `--region` and/or `--profile` option values can be used to orient the AWS IoT ELF differently.
 
-When looking through the `create_thing(cli)` function, the core of the `create` command are these lines of code:
+When looking through the `create_thing(cli)` function, the core of the `create` command is shown in these lines of code:
 ````
 ...
     # generate a numbered thing name
@@ -142,9 +142,9 @@ To force a clean up of only the local stored files, type:
 (venv)$ python elf.py clean --only-local
 ````
 
-When looking through the `clean_up(cli)` function, the core of the `clean` command are these lines of code:
+When looking through the `clean_up(cli)` function, the core of the `clean` command is shown in these lines of code:
 ````
-...
+..snip..
     iot.detach_principal_policy(
         policyName=thing[policy_name_key],
         principal=thing['certificateArn']
@@ -168,7 +168,7 @@ When looking through the `clean_up(cli)` function, the core of the `clean` comma
 ..snip..
     iot.delete_thing(thingName=thing_name)
 ````
-All steps prior to `delete_thing` are required in order, to detach and clean up a fully functional and authorized Thing.
+All steps prior to `delete_thing` are required, in order to detach and clean up a fully functional and authorized Thing.
 
 #### Help
 For additional detailed help and configuration options, enter: 
