@@ -4,7 +4,7 @@ An AWS IoT python example client that strives to be Extremely Low Friction (ELF)
 
 ## Overview
 
-The **AWS IoT ELF** python example client demonstrates how one can **Create** Things, **Send** messages to Things, and **Clean** up Things in the AWS IoT service using the AWS SDK for Python. This example also demonstrates how to bring together `boto3` and the standard MQTT client `paho-mqtt` in a straightforward fashion.
+The **AWS IoT ELF** python example client demonstrates how one can **Create** Things, **Send** messages to Things, and **Clean** up Things in the AWS IoT service using the AWS SDK for Python (aka. `boto3`). This example also demonstrates how to bring together `boto3` and the standard MQTT client `paho-mqtt` in a straightforward fashion.
 
 #### Create Thing(s)
 Once the AWS IoT ELF's *getting started* is complete, to create a single Thing in the AWS IoT service, simply type:
