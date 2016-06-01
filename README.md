@@ -181,7 +181,7 @@ For additional detailed help and configuration options, enter:
 ````
 
 ## Troubleshooting
-**Q:** When I try to send messages, I see a `ResourceAlreadyExistsException` exception similar to the following. What might be wrong?
+**Q:** When I try to send messages, I see a `ResourceAlreadyExistsException` similar to the following. What might be wrong?
 ````
 ...example...
 botocore.exceptions.ClientError: An error occurred (ResourceAlreadyExistsException) when calling the 
@@ -189,7 +189,7 @@ CreatePolicy operation: Policy cannot be created - name already exists (name=pol
 ````
 **A:** In this example exception, for some reason the policy name `policy-thing_0` already exists and is colliding with the new policy to be created and applied to the Thing. The old existing policy needs to be [Detached](http://docs.aws.amazon.com/cli/latest/reference/iot/detach-principal-policy.html) and [Deleted](http://docs.aws.amazon.com/cli/latest/reference/iot/delete-policy.html) manually using the AWS CLI or AWS IoT Console. 
 
-**Q:** When I try to `create`, `send`, or `clean`, I see an `AccessDeniedException` exception similar to the following. What might be wrong?
+**Q:** When I try to `create`, `send`, or `clean`, I see an `AccessDeniedException` similar to the following. What might be wrong?
 ````
 ...example...
 botocore.exceptions.ClientError: An error occurred (AccessDeniedException) when calling the 
