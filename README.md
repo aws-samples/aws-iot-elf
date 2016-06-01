@@ -1,10 +1,10 @@
 # aws-iot-elf
 
-An Extremely Low Friction (ELF) AWS IoT python example client
+An AWS IoT python example client that strives to be Extremely Low Friction (ELF)
 
 ## Overview
 
-The **AWS IoT ELF** python example client is an example of how one can **Create** Things, **Send** messages to Things, and **Clean** up Things in the AWS IoT service using the AWS SDK for Python. *(This is not to be a replacement for the AWS CLI)*
+The **AWS IoT ELF** python example client demonstrates how one can **Create** Things, **Send** messages to Things, and **Clean** up Things in the AWS IoT service using the AWS SDK for Python. This example also demonstrates how to bring together `boto3` and the standard MQTT client `paho-mqtt` in a straightforward fashion.
 
 #### Create Thing(s)
 Once the AWS IoT ELF's *getting started* is complete, to create a single Thing in the AWS IoT service, simply type:
@@ -81,25 +81,46 @@ Lastly, to [Authenticate with AWS IoT](http://docs.aws.amazon.com/iot/latest/dev
 curl -o aws-iot-rootCA.crt https://www.symantec.com/content/en/us/enterprise/verisign/roots/VeriSign-Class%203-Public-Primary-Certification-Authority-G5.pem
 ````
 
-## Details
+## Detailed Help
+#### Defaults
+The AWS IoT ELF uses the following defaults:
+- region: `us-west-2`
+- MQTT topic: `elf`
+- message: `IoT ELF Hello`
+- send message duration: 10 seconds
+
 #### Create Thing(s)
+Using the `clean` command will invoke the `create_things(cli)` function with the given command line arguments.
+
 To create a given number of Things (eg. `3`) in the AWS IoT service in a specific region, type:
 ````
 (venv)$ python elf.py --region <region_name> create 3
 ````
+This command results in three things: `thing_0`, `thing_1`, and `thing_2` being created in `<region_name>`.
 
 To create a single Thing in the AWS IoT service using a different AWS CLI profile, type:
 ````
-(venv)$ python elf.py --profile elf create
+(venv)$ python elf.py --profile <profile_name> create
 ````
 
+To create a single Thing in the AWS IoT service in a specific region using a different AWS CLI profile, type:
+````
+(venv)$ python elf.py --region <region_name> --profile <profile_name> create
+````
+
+Calling the `create` command with a `--region` and/or `--profile` CLI option means that the Things will be created in that region and will use the corresponding AWS API Key and AWS Secret Key pair. Additional `send` and `clean` commands should use the same options. In this way the AWS IoT ELF will send messages to the same region and with the same profile used to `create` the Things in the first place. Once `clean` is called successfully, different `--region` and/or `--profile` option values can be used to orient the AWS IoT ELF differently.
+
 #### Send Messages
+Using the `send` command will invoke the `send_messages(cli)` function with the given command line arguments.
+
 To send a specific message on a specific topic for a specified duration in another region, type:
 ````
 (venv)$ python elf.py --region <region_name> send --topic 'elf/example' --duration <num_seconds> 'Example ELF message'
 ````
 
 #### Clean Thing(s)
+Using the `clean` command will invoke the `clean_up(cli)` function with the given command line arguments.
+
 To force a clean up of only the local stored files, type:
 ````
 (venv)$ python elf.py clean --only-local
@@ -116,31 +137,26 @@ For additional detailed help and configuration options, enter:
 ````
 
 ## Troubleshooting
-**Q:** When I try to send messages, I see a `ResourceAlreadyExistsException` exception similar to the following. What could be wrong?
+**Q:** When I try to send messages, I see a `ResourceAlreadyExistsException` exception similar to the following. What might be wrong?
 ````
 ...example...
-  File "elf.py", line 182, in _create_and_attach_policy
-    policyDocument=policy
-  File "/Users/brettf/dev/iot/bites/aws-iot-elf/venv/lib/python2.7/site-packages/botocore/client.py", line 258, in _api_call
-    return self._make_api_call(operation_name, kwargs)
-  File "/Users/brettf/dev/iot/bites/aws-iot-elf/venv/lib/python2.7/site-packages/botocore/client.py", line 548, in _make_api_call
-    raise ClientError(parsed_response, operation_name)
 botocore.exceptions.ClientError: An error occurred (ResourceAlreadyExistsException) when calling the CreatePolicy operation: Policy cannot be created - name already exists (name=policy-elf-thing-0)
 ````
 **A:** In this example exception, for some reason the policy name `policy-elf-thing-0` already exists and is colliding with the new policy being created and applied to the Thing. The old existing policy needs to be [Detached](http://docs.aws.amazon.com/cli/latest/reference/iot/detach-principal-policy.html) and [Deleted](http://docs.aws.amazon.com/cli/latest/reference/iot/delete-policy.html) manually using the AWS CLI or AWS IoT Console. 
 
-**Q:** When I try to `create`, `send`, or `clean`, I see an `AccessDeniedException` exception similar to the following. What could be wrong?
+**Q:** When I try to `create`, `send`, or `clean`, I see an `AccessDeniedException` exception similar to the following. What might be wrong?
 ````
 ...example...
-File "elf.py", line 330, in create_things
-    keys_cert = iot.create_keys_and_certificate(setAsActive=True)
-  File "/Users/brettf/dev/iot/bites/aws-iot-elf/venv/lib/python2.7/site-packages/botocore/client.py", line 258, in _api_call
-    return self._make_api_call(operation_name, kwargs)
-  File "/Users/brettf/dev/iot/bites/aws-iot-elf/venv/lib/python2.7/site-packages/botocore/client.py", line 548, in _make_api_call
-    raise ClientError(parsed_response, operation_name)
 botocore.exceptions.ClientError: An error occurred (AccessDeniedException) when calling the CreateKeysAndCertificate operation: User: arn:aws:iam::XXXXXXYYYYYY:user/elf is not authorized to perform: iot:CreateKeysAndCertificate
 ````
 **A:** In this example exception, the user `elf` does not have enough privilege to perform the `iot:CreateKeysAndCertificate` action on the AWS IoT service. Make sure the privileges as described in the *Getting Started* section are associated with the user (and specifically API keys) experiencing the exception.
+
+**Q:** When I try to `send` messages using my recently created Things, I see a `ResourceNotFoundException` similar to the following. What might be wrong?
+````
+...example...
+botocore.exceptions.ClientError: An error occurred (ResourceNotFoundException) when calling the AttachPrincipalPolicy operation: The certificate given in the principal does not exist.
+````
+**A:** In this example exception, the certificate recorded into the AWS IoT ELF config file does not exist in the region. Most likely the `create` command was called with a `--region` option that is not the same as the `--region` used when calling the `send` command.
 
 Related Resources
 -----------------
