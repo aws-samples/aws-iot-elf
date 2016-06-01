@@ -201,7 +201,8 @@ authorized to perform: iot:CreateKeysAndCertificate
 **Q:** When I try to `send` messages using my recently created Things, I see a `ResourceNotFoundException` similar to the following. What might be wrong?
 ````
 ...example...
-botocore.exceptions.ClientError: An error occurred (ResourceNotFoundException) when calling the AttachPrincipalPolicy operation: The certificate given in the principal does not exist.
+botocore.exceptions.ClientError: An error occurred (ResourceNotFoundException) when calling the 
+AttachPrincipalPolicy operation: The certificate given in the principal does not exist.
 ````
 **A:** In this example exception, the certificate recorded into the AWS IoT ELF config file does not exist in the region. Most likely the `create` command was called with a `--region` option that is not the same as the `--region` used when calling the `send` command.
 
