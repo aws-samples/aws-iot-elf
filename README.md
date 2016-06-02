@@ -90,7 +90,7 @@ The AWS IoT ELF uses the following defaults:
 - send message duration: `10 seconds`
 
 #### Create Thing(s)
-Using the `clean` command will invoke the `create_things(cli)` function with the given command line arguments.
+Using the `clean` command will invoke the [`create_things(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L286) function with the given command line arguments.
 
 To create a given number of Things (eg. `3`) in the AWS IoT service in a specific region, type:
 ````
@@ -127,7 +127,7 @@ When looking through the `create_thing(cli)` function, the core of the `create` 
 Everything else around this code is to prepare for or record the results of the invocation of these functions.
 
 #### Send Messages
-Using the `send` command will invoke the `send_messages(cli)` function with the given command line arguments.
+Using the `send` command will invoke the [`send_messages(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L360) function with the given command line arguments.
 
 To send a specific message on a specific topic for a specified duration in another region, type:
 ````
@@ -135,7 +135,7 @@ To send a specific message on a specific topic for a specified duration in anoth
 ````
 
 #### Clean Thing(s)
-Using the `clean` command will invoke the [`clean_up(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L286) function with the given command line arguments.
+Using the `clean` command will invoke the [`clean_up(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L405) function with the given command line arguments.
 
 To force a clean up of only the local stored files, type:
 ````
