@@ -182,6 +182,7 @@ For additional detailed help and configuration options, enter:
 
 ## Troubleshooting
 **Q:** I seem to be need to upgrade my `openssl` and `python` installations. Why?
+
 **A:** A version of [Python 2.7 ssl](https://docs.python.org/2/library/ssl.html) with support for Open SSL 1.0.1 is necessary to support the security posture (and specifically [TLSv1_2](https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_1.2)) required by the AWS IoT service. 
 
 **Q:** When I try to send messages, I see a `ResourceAlreadyExistsException` similar to the following. What might be wrong?
