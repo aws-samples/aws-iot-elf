@@ -135,7 +135,7 @@ To send a specific message on a specific topic for a specified duration in anoth
 ````
 
 #### Clean Thing(s)
-Using the `clean` command will invoke the `clean_up(cli)` function with the given command line arguments.
+Using the `clean` command will invoke the [`clean_up(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L286) function with the given command line arguments.
 
 To force a clean up of only the local stored files, type:
 ````
