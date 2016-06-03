@@ -145,14 +145,14 @@ Everything else around this code is to prepare for or record the results of the 
 Lastly, when you run the `create` commad you can see in the exmaple output below that a thing named `thing_0` was created and associated with a certificate in region `us-west-2`.
 ```
 $ python elf.py create
-2016-06-03 01:32:09,097:iot-elf:INFO - Read ELF ID from config: 95bb3ad5-95d1-4c9a-b818-b23f92fcde30
-2016-06-03 01:32:09,143:iot-elf:INFO - [create_things] ELF creating 1 thing
-2016-06-03 01:32:09,803:iot-elf:INFO - Thing:'thing_0' associated with cert:'arn:aws:iot:us-west-2:112472691261:cert/EXAMPLEEXAMPLEEXAMPLEb326b72e76c2f67ccd6f8ec15515a9bd28168b2cc42'
-2016-06-03 01:32:09,803:iot-elf:INFO - Thing Name: thing_0 and PEM file: ~/dev/aws-iot-elf/misc/thing_0.pem
-2016-06-03 01:32:09,803:iot-elf:INFO - Thing Name: thing_0 Public Key File: ~/dev/aws-iot-elf/misc/thing_0.pub
-2016-06-03 01:32:09,804:iot-elf:INFO - Thing Name: thing_0 Private Key File: ~/dev/aws-iot-elf/misc/thing_0.prv
-2016-06-03 01:32:09,804:iot-elf:INFO - Wrote 1 things to config file: ~/dev/aws-iot-elf/misc/things.json
-2016-06-03 01:32:09,804:iot-elf:INFO - [create_things] ELF created 1 things in region:'us-west-2'.
+..iot-elf:INFO - Read ELF ID from config: 95bb3ad5-95d1-4c9a-b818-b23f92fcde30
+..iot-elf:INFO - [create_things] ELF creating 1 thing
+..iot-elf:INFO - Thing:'thing_0' associated with cert:'arn:aws:iot:us-west-2:112472691261:cert/EXAMPLEEXAMPLEEXAMPLEb326b72e76c2f67ccd6f8ec15515a9bd28168b2cc42'
+..iot-elf:INFO - Thing Name: thing_0 and PEM file: ~/dev/aws-iot-elf/misc/thing_0.pem
+..iot-elf:INFO - Thing Name: thing_0 Public Key File: ~/dev/aws-iot-elf/misc/thing_0.pub
+..iot-elf:INFO - Thing Name: thing_0 Private Key File: ~/dev/aws-iot-elf/misc/thing_0.prv
+..iot-elf:INFO - Wrote 1 things to config file: ~/dev/aws-iot-elf/misc/things.json
+..iot-elf:INFO - [create_things] ELF created 1 things in region:'us-west-2'.
 ```
 
 #### Send Messages
