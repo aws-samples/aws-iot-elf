@@ -51,8 +51,8 @@ $ source ~/dev/aws-iot-elf/venv/bin/activate
 
 Now install the AWS IoT ELF dependencies into your local environment using these commands: 
 ````
-$ cd ~/dev/aws-iot-elf
-$ pip install -r requirements.txt
+(venv)$ cd ~/dev/aws-iot-elf
+(venv)$ pip install -r requirements.txt
 ````
 Next, [install](http://docs.aws.amazon.com/cli/latest/userguide/installing.html) and [configure](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html) the AWS CLI.
 
@@ -92,7 +92,7 @@ When you configure the AWS CLI, the API Keys you install as the default profile 
 
 Now to [Authenticate with AWS IoT](http://docs.aws.amazon.com/iot/latest/developerguide/identity-in-iot.html) using Server Authentication you will need to download the [Verisign root CA](https://www.symantec.com/content/en/us/enterprise/verisign/roots/VeriSign-Class%203-Public-Primary-Certification-Authority-G5.pem) and save it as a file `aws-iot-rootCA.crt`, or simply execute this command in the same directory as `elf.py`.
 ````
-curl -o aws-iot-rootCA.crt https://www.symantec.com/content/en/us/enterprise/verisign/roots/VeriSign-Class%203-Public-Primary-Certification-Authority-G5.pem
+(venv)$ curl -o aws-iot-rootCA.crt https://www.symantec.com/content/en/us/enterprise/verisign/roots/VeriSign-Class%203-Public-Primary-Certification-Authority-G5.pem
 ````
 
 Lastly, you will probably want to read through the Troubleshooting section at the bottom of these instructions, just in case you experience a bump. 
