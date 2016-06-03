@@ -533,8 +533,9 @@ if __name__ == '__main__':
                       help="The root certificate for the generated credentials")
     send.add_argument('--topic', dest='topic', default="elf",
                       help='The topic to which the message will be sent.')
-    send.add_argument('--duration', dest='duration', type=int, default=10,
-                      help='The duration that messages will be sent.')
+    send.add_argument(
+        '--duration', dest='duration', type=int, default=10,
+        help='The messages will be sent once a second for <duration> seconds.')
     send.set_defaults(func=send_messages)
 
     clean = subparsers.add_parser(
