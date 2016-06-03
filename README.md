@@ -147,7 +147,7 @@ Lastly, when you run the `create` commad you can see in the exmaple output below
 $ python elf.py create
 ..iot-elf:INFO - Read ELF ID from config: 95bb3ad5-95d1-4c9a-b818-b23f92fcde30
 ..iot-elf:INFO - [create_things] ELF creating 1 thing
-..iot-elf:INFO - Thing:'thing_0' associated with cert:'arn:aws:iot:us-west-2:112472691261:cert/EXAMPLEEXAMPLEEXAMPLEb326b72e76c2f67ccd6f8ec15515a9bd28168b2cc42'
+..iot-elf:INFO - Thing:'thing_0' associated with cert:'arn:aws:iot:us-west-2:EXAMPLE1261:cert/EXAMPLEEXAMPLEEXAMPLEb326b72e76c2f67ccd6f8ec15515a9bd28168b2cc42'
 ..iot-elf:INFO - Thing Name: thing_0 and PEM file: ~/dev/aws-iot-elf/misc/thing_0.pem
 ..iot-elf:INFO - Thing Name: thing_0 Public Key File: ~/dev/aws-iot-elf/misc/thing_0.pub
 ..iot-elf:INFO - Thing Name: thing_0 Private Key File: ~/dev/aws-iot-elf/misc/thing_0.prv
