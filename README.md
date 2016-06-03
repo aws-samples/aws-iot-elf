@@ -32,12 +32,26 @@ To clean up all previously created Things, type:
 
 To get this example working with Python 2.7+. First clone this repo to your local machine.
 ````
+$ cd ~
+$ mkdir dev
+$ cd ~/dev
 $ git clone https://github.com/awslabs/aws-iot-elf.git
 ````
-Then to keep the AWS IoT ELF python dependencies separate, you probably want to [install](https://virtualenv.pypa.io/en/stable/) `virtualenv` and create a virtual environment (eg. `$ virtualenv venv`). 
+This will create a local folder `~/dev/aws-iot-elf`.
 
-Now install the AWS IoT ELF dependencies into your local environment using: 
+To keep the AWS IoT ELF python dependencies separate, you probably want to [install](https://virtualenv.pypa.io/en/stable/) `virtualenv`. If you choose to install `virtualenv` then create a virtual environment:
 ````
+$ cd ~/dev
+$ virtualenv venv
+````
+...and then activate that virtual environment
+````
+$ source ~/dev/aws-iot-elf/venv/bin/activate
+````
+
+Now install the AWS IoT ELF dependencies into your local environment using these commands: 
+````
+$ cd ~/dev/aws-iot-elf
 $ pip install -r requirements.txt
 ````
 Next, [install](http://docs.aws.amazon.com/cli/latest/userguide/installing.html) and [configure](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html) the AWS CLI.
@@ -76,10 +90,12 @@ When you configure the AWS CLI, the API Keys you install as the default profile 
 }
 ````
 
-Lastly, to [Authenticate with AWS IoT](http://docs.aws.amazon.com/iot/latest/developerguide/identity-in-iot.html) using Server Authentication you will need to download the [Verisign root CA](https://www.symantec.com/content/en/us/enterprise/verisign/roots/VeriSign-Class%203-Public-Primary-Certification-Authority-G5.pem) and save it as a file `aws-iot-rootCA.crt`, or simply execute this command in the same directory as `elf.py`.
+Now to [Authenticate with AWS IoT](http://docs.aws.amazon.com/iot/latest/developerguide/identity-in-iot.html) using Server Authentication you will need to download the [Verisign root CA](https://www.symantec.com/content/en/us/enterprise/verisign/roots/VeriSign-Class%203-Public-Primary-Certification-Authority-G5.pem) and save it as a file `aws-iot-rootCA.crt`, or simply execute this command in the same directory as `elf.py`.
 ````
 curl -o aws-iot-rootCA.crt https://www.symantec.com/content/en/us/enterprise/verisign/roots/VeriSign-Class%203-Public-Primary-Certification-Authority-G5.pem
 ````
+
+Lastly, you will probably want to read through the Troubleshooting section at the bottom of these instructions, just in case you experience a bump. 
 
 ## Detailed Help
 #### Defaults
@@ -88,6 +104,9 @@ The AWS IoT ELF uses the following defaults:
 - MQTT topic: `elf/<thing_#>`
 - message: `IoT ELF Hello`
 - send message duration: `10 seconds`
+
+#### ELF CLI
+In normal Python fashion, the order of commands matters think of them organized as 
 
 #### Create Thing(s)
 Using the `clean` command will invoke the [`create_things(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L286) function with the given command line arguments.
@@ -181,6 +200,16 @@ For additional detailed help and configuration options, enter:
 ````
 
 ## Troubleshooting
+**Q:** When I type in my command line I get a parameter parsing error. For example this command line gives an error:
+````
+$ python elf.py clean --only-local --region us-east-1
+usage: elf.py [-h] [--region REGION] [--profile PROFILE_NAME]
+              {create,send,clean} ...
+elf.py: error: unrecognized arguments: --region us-east-1
+````
+
+**A:** This example error is caused when using the ELF Command Line because the order of the commands and options matters. The general structure of all ELF commands are: `python elf.py [global-elf-options] <command> [command-specific-options]`.  The `[global-elf-options]` should be the same across commands. The `[command-specific-options]` are specific to any given command.
+
 **Q:** I seem to be need to upgrade my `openssl` and `python` installations. Why?
 
 **A:** A version of [Python 2.7 ssl](https://docs.python.org/2/library/ssl.html) with support for Open SSL 1.0.1 is necessary to support the security posture (and specifically [TLSv1_2](https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_1.2)) required by the AWS IoT service. 
