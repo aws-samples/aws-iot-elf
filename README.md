@@ -105,9 +105,6 @@ The AWS IoT ELF uses the following defaults:
 - message: `IoT ELF Hello`
 - send message duration: `10 seconds`
 
-#### ELF CLI
-In normal Python fashion, the order of commands matters think of them organized as 
-
 #### Create Thing(s)
 Using the `clean` command will invoke the [`create_things(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L286) function with the given command line arguments.
 
