@@ -31,6 +31,7 @@ ch.setFormatter(formatter)
 log.addHandler(ch)
 
 AWS_IOT_MQTT_PORT = 8883
+DEFAULT_TOPIC = "elf"
 elf_cfg_dir = "misc"
 full_certs = "things.json"
 cfg_dir = os.getcwd() + '/' + elf_cfg_dir + '/'
@@ -177,7 +178,11 @@ class ElfPoster(threading.Thread):
         self.message = cli.message
         self.thing = thing
         self.root_cert = cli.root_cert
-        self.topic = cli.topic
+        if cli.topic == DEFAULT_TOPIC:
+            self.topic = '{0}/{1}'.format(DEFAULT_TOPIC, self.thing_name)
+        else:
+            self.topic = cli.topic
+
         self.region = cli.region
         self.cfg = cfg
         self.post_duration = cli.duration
@@ -256,17 +261,16 @@ class ElfPoster(threading.Thread):
         finish = start + datetime.timedelta(seconds=self.post_duration)
         while finish > datetime.datetime.now():
             time.sleep(1)  # wait a second between publishing iterations
-            thing_topic = '{0}/{1}'.format(self.topic, self.thing_name)
             msg = {
                 "ts": "{0}".format(time.time()),
                 "msg": "{0}".format(self.message)
             }
 
             log.info("ELF {0} posting message:'{1}' on topic: {2}".format(
-                self.thing_name, msg, thing_topic))
+                self.thing_name, msg, self.topic))
             # publish a JSON equivalent of this Thing's message with a
             # timestamp
-            self.mqttc.publish(thing_topic, json.dumps(msg))
+            self.mqttc.publish(self.topic, json.dumps(msg))
 
 
 def _init(cli):
@@ -528,10 +532,13 @@ if __name__ == '__main__':
         description='Send the given message from each created Thing to the topic.')
     send.add_argument('message', nargs='?', default="IoT ELF Hello",
                       help="The message each Thing will send.")
+    send.add_argument(
+        '--json-file', dest='json_file',
+        help="The JSON file content to be included in an ELF message.")
     send.add_argument('--root-cert', dest='root_cert',
                       default="aws-iot-rootCA.crt",
                       help="The root certificate for the generated credentials")
-    send.add_argument('--topic', dest='topic', default="elf",
+    send.add_argument('--topic', dest='topic', default=DEFAULT_TOPIC,
                       help='The topic to which the message will be sent.')
     send.add_argument(
         '--duration', dest='duration', type=int, default=10,
