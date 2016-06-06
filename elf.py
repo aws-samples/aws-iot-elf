@@ -549,9 +549,10 @@ if __name__ == '__main__':
         'clean',
         description='Clean up artifacts used to communicate with AWS IoT')
     clean.set_defaults(func=clean_up)
-    clean.add_argument('--force', '--only-local', dest='only_local',
-                       action='store_true',
-                       help='Force clean the locally stored ELF files.')
+    clean.add_argument(
+        '--force', '--only-local', dest='only_local',
+        action='store_true',
+        help='WARNING - Force clean only the locally stored ELF files. ELF will NOT clean up the resources created in the AWS IoT service.')
 
     args = parser.parse_args()
     args.func(args)

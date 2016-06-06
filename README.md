@@ -212,7 +212,7 @@ For additional detailed help and configuration options, enter:
 ## Troubleshooting
 **Q:** When I type in my command line I get a parameter parsing error. For example this command line gives an error:
 ```
-$ python elf.py clean --only-local --region us-east-1
+$ python elf.py clean --region us-east-1
 usage: elf.py [-h] [--region REGION] [--profile PROFILE_NAME]
               {create,send,clean} ...
 elf.py: error: unrecognized arguments: --region us-east-1
