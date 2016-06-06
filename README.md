@@ -163,6 +163,16 @@ To send a specific message on a specific topic for a specified duration in anoth
 (venv)$ python elf.py --region <region_name> send --topic 'elf/example' --duration <num_seconds> 'Example ELF message'
 ```
 
+To send a JSON payload as a message read from a file named `example.json`, type:
+```
+(venv)$ python elf.py --region <region_name> send --json-message example.json
+```
+...which will result in messages being sent as shown in the example output:
+```
+...iot-elf:INFO - ELF thing_0 posting message:'{'msg': {u'some': u'thing', u'another': u'thing'}, 'ts': '1465257133.82'}' on topic: elf/thing_0
+...iot-elf:INFO - ELF thing_0 posting message:'{'msg': {u'some': u'thing', u'another': u'thing'}, 'ts': '1465257134.82'}' on topic: elf/thing_0
+```
+
 #### Clean Thing(s)
 Using the `clean` command will invoke the [`clean_up(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L405) function with the given command line arguments. This will remove all resources that were created by ELF in the AWS IoT service and on the local file system. 
 
