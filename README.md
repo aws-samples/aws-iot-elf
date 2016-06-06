@@ -164,9 +164,9 @@ To send a specific message on a specific topic for a specified duration in anoth
 ```
 
 #### Clean Thing(s)
-Using the `clean` command will invoke the [`clean_up(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L405) function with the given command line arguments.
+Using the `clean` command will invoke the [`clean_up(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L405) function with the given command line arguments. This will remove all resources that were created by ELF in the AWS IoT service and on the local file system. 
 
-To force a clean up of only the local stored files, type:
+If you want to force only a clean up of the locally stored files, type:
 ```
 (venv)$ python elf.py clean --only-local
 ```
