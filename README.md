@@ -41,7 +41,7 @@ This will create a local folder `~/dev/aws-iot-elf`.
 
 To keep the AWS IoT ELF python dependencies separate, you probably want to [install](https://virtualenv.pypa.io/en/stable/) `virtualenv`. If you choose to install `virtualenv` then create a virtual environment:
 ```
-$ cd ~/dev
+$ cd ~/dev/aws-iot-elf
 $ virtualenv venv
 ```
 ...and then activate that virtual environment
