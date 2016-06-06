@@ -140,7 +140,7 @@ When looking through the `create_thing(cli)` function, the core of the `create` 
         thingName=t_name, principal=keys_cert['certificateArn'])
 ...
 ```
-Everything else around this code is to prepare for or record the results of the invocation of these functions.
+Everything else around this code is to prepare for, or record the results of, the invocation of these functions.
 
 Lastly, when you run the `create` commad you can see in the exmaple output below that a thing named `thing_0` was created and associated with a certificate in region `us-west-2`.
 ```
