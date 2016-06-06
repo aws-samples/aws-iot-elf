@@ -125,6 +125,21 @@ def _get_iot_session(region, profile_name):
         profile_name=profile_name).client('iot')
 
 
+def _get_json_message(json_message):
+    msg = {}
+    if json_message is None:
+        return msg
+
+    if os.path.exists(json_message) and os.path.isfile(json_message):
+        try:
+            with open(json_message, "r") as in_file:
+                msg = json.load(in_file)
+        except OSError as ose:
+            log.error('OSError while reading JSON Message file. {0}'.format(
+                ose))
+    return msg
+
+
 def _create_and_attach_policy(region, topic, thing_name, thing_cert_arn, cli):
     # Create and attach to the principal/certificate the minimal privilege
     # thing policy that allows publish and subscribe for the 'thing_name' Thing
@@ -176,6 +191,7 @@ class ElfPoster(threading.Thread):
         )
         self.thing_name = thing_name
         self.message = cli.message
+        self.json_message = cli.json_message
         self.thing = thing
         self.root_cert = cli.root_cert
         if cli.topic == DEFAULT_TOPIC:
@@ -263,8 +279,11 @@ class ElfPoster(threading.Thread):
             time.sleep(1)  # wait a second between publishing iterations
             msg = {
                 "ts": "{0}".format(time.time()),
-                "msg": "{0}".format(self.message)
             }
+            if self.json_message is None:
+                msg['msg'] = "{0}".format(self.message)
+            else:
+                msg['msg'] = _get_json_message(self.json_message)
 
             log.info("ELF {0} posting message:'{1}' on topic: {2}".format(
                 self.thing_name, msg, self.topic))
@@ -325,7 +344,7 @@ def create_things(cli):
         log.info("Thing:'{0}' associated with cert:'{1}'".format(
             t_name, cert_arn))
 
-        # Save all the Key and Certificate files locally
+        # Save all the Key and Certificate files locally for future cleanup
         # ..could be added to Keyring later (https://github.com/jaraco/keyring)
         try:
             certname = cfg_dir + t_name + ".pem"
@@ -532,9 +551,8 @@ if __name__ == '__main__':
         description='Send the given message from each created Thing to the topic.')
     send.add_argument('message', nargs='?', default="IoT ELF Hello",
                       help="The message each Thing will send.")
-    send.add_argument(
-        '--json-file', dest='json_file',
-        help="The JSON file content to be included in an ELF message.")
+    send.add_argument('--json-message', dest='json_message',
+                      help="The JSON content to be included in an ELF message.")
     send.add_argument('--root-cert', dest='root_cert',
                       default="aws-iot-rootCA.crt",
                       help="The root certificate for the generated credentials")
