@@ -1,5 +1,18 @@
 #!/usr/bin/env python3
 
+
+# Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License"). You may not
+# use this file except in compliance with the License. A copy of the License is
+# located at
+#     http://aws.amazon.com/apache2.0/
+#
+# or in the "license" file accompanying this file. This file is distributed on
+# an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+# express or implied. See the License for the specific language governing
+# permissions and limitations under the License.
+
 import os
 import ssl
 import json
@@ -141,8 +154,8 @@ def _get_json_message(json_message):
 
 
 def _create_and_attach_policy(region, topic, thing_name, thing_cert_arn, cli):
-    # Create and attach to the principal/certificate the minimal privilege
-    # thing policy that allows publish and subscribe for the 'thing_name' Thing
+    # Create and attach to the principal/certificate the minimal action
+    # privileges Thing policy that allows publish and subscribe
     tp = {
         "Version": "2012-10-17",
         "Statement": [{
@@ -180,7 +193,8 @@ def _create_and_attach_policy(region, topic, thing_name, thing_cert_arn, cli):
 
 
 class ElfPoster(threading.Thread):
-    """The thread that repeatedly posts records to a topic for a given Thing.
+    """
+    The thread that repeatedly posts records to a topic for a given Thing.
     """
 
     def __init__(
@@ -272,6 +286,7 @@ class ElfPoster(threading.Thread):
         log.debug("[on_log] {0}: Log level: {1} message:'{2}'".format(
             self.thing_name, level, msg))
 
+    # The thread that does the actual message sending for the desired duration
     def run(self):
         start = datetime.datetime.now()
         finish = start + datetime.timedelta(seconds=self.post_duration)
@@ -307,9 +322,9 @@ def _init(cli):
 
 
 def create_things(cli):
-    '''
+    """
     Create and activate a specified number of Things in the AWS IoT Service.
-    '''
+    """
     _init(cli)
     region = cli.region
     iot = _get_iot_session(region, cli.profile_name)
@@ -381,10 +396,10 @@ def create_things(cli):
 
 
 def send_messages(cli):
-    '''
+    """
     Send messages through the AWS IoT service from the previously created 
     number of Things.
-    '''
+    """
     _init(cli)
     iot = _get_iot_session(cli.region, cli.profile_name)
 
@@ -426,10 +441,10 @@ def send_messages(cli):
 
 
 def clean_up(cli):
-    '''
+    """
     Clean up all Things previously created in the AWS IoT Service and files 
     stored locally.
-    '''
+    """
     _init(cli)
     log.info("[clean_up] ELF is cleaning up...")
     iot = _get_iot_session(cli.region, cli.profile_name)
