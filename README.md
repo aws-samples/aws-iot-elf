@@ -181,7 +181,7 @@ To clean up all previously created resources, type:
 (venv)$ python elf.py clean
 ```
 
-If you want to force only a clean up of the locally stored files, leaving the resources created in the service alone, type:
+If you want to force only a clean up of the locally stored files, **without cleaning** the resources created in the AWS IoT service, type:
 ```
 (venv)$ python elf.py clean --only-local
 ```
