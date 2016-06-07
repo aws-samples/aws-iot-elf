@@ -273,6 +273,7 @@ class ElfPoster(threading.Thread):
         log.info("[on_message] {0}: topic:{1} msg:{2}".format(
             self.thing_name, msg.topic, str(msg.payload)))
 
+    # The callback used when the client connects with the MQTT broker
     def on_connect(self, mqttc, userdata, flags, msg):
         log.info("[on_connect] {0}: Connected with result: {1}".format(
             self.thing_name, msg))
