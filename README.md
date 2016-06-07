@@ -176,7 +176,12 @@ To send a JSON payload as a message read from a file named `example.json`, type:
 #### Clean Thing(s)
 Using the `clean` command will invoke the [`clean_up(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L405) function with the given command line arguments. This will remove all resources that were created by ELF in the AWS IoT service and on the local file system. 
 
-If you want to force only a clean up of the locally stored files, type:
+To clean up all previously created resources, type:
+```
+(venv)$ python elf.py clean
+```
+
+If you want to force only a clean up of the locally stored files, leaving the resources created in the service alone, type:
 ```
 (venv)$ python elf.py clean --only-local
 ```
