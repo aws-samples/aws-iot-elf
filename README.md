@@ -7,7 +7,7 @@ An AWS IoT python example client that strives to be Extremely Low Friction (ELF)
 The **AWS IoT ELF** python example client demonstrates how one can **Create** Things, **Send** messages to Things, and **Clean** up Things in the AWS IoT service using the AWS SDK for Python (aka. `boto3`). This example also demonstrates how to bring together `boto3` and the standard MQTT client `paho-mqtt` in a straightforward fashion.
 
 #### Create Thing(s)
-Once the AWS IoT ELF's *getting started* is complete, to create a single Thing in the AWS IoT service, simply type:
+Once the *getting started* guide below has been completed, to create a single Thing in the AWS IoT service, simply type:
 ```
 (venv)$ python elf.py create
 ```
@@ -56,7 +56,7 @@ Now install the AWS IoT ELF dependencies into your local environment using these
 ```
 Next, [install](http://docs.aws.amazon.com/cli/latest/userguide/installing.html) and [configure](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html) the AWS CLI.
 
-When you configure the AWS CLI, the API Keys you install as the default profile or a [named profile](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-multiple-profiles) should have at least the following privileges in an associated policy:
+When you configure the AWS CLI, the API Keys you install as the default profile or a [named profile](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-multiple-profiles) should have at least the following privileges in an associated IAM policy:
 ```json
 {
     "Version": "2012-10-17",
@@ -96,6 +96,8 @@ Now to [Authenticate with AWS IoT](http://docs.aws.amazon.com/iot/latest/develop
 ```
 
 Lastly, you will probably want to read through the Troubleshooting section at the bottom of these instructions, just in case you experience a bump. 
+
+To validate the AWS IoT ELF is setup correctly, execute `python elf.py create` and `python elf.py clean`. You should not see any errors.
 
 ## Detailed Help
 #### Defaults
