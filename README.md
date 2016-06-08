@@ -144,7 +144,7 @@ When looking through the `create_thing(cli)` function, the core of the `create` 
 ```
 Everything else around this code is to prepare for, or record the results of, the invocation of these functions.
 
-Lastly, when you run the `create` commad you can see in the exmaple output below that a thing named `thing_0` was created and associated with a certificate in region `us-west-2`.
+Lastly, when you run the `create` command you can see in the example output below that a thing named `thing_0` was created and associated with a certificate in region `us-west-2`.
 ```
 $ python elf.py create
 ..iot-elf:INFO - Read ELF ID from config: 95bb3ad5-95d1-4c9a-b818-b23f92fcde30
