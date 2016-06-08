@@ -301,11 +301,12 @@ class ElfPoster(threading.Thread):
             else:
                 msg['msg'] = _get_json_message(self.json_message)
 
-            log.info("ELF {0} posting message:'{1}' on topic: {2}".format(
-                self.thing_name, msg, self.topic))
             # publish a JSON equivalent of this Thing's message with a
             # timestamp
-            self.mqttc.publish(self.topic, json.dumps(msg))
+            send = json.dumps(msg, separators=(', ', ': '))
+            log.info("ELF {0} posting message: {1} on topic: {2}".format(
+                self.thing_name, send, self.topic))
+            self.mqttc.publish(self.topic, send)
 
 
 def _init(cli):
@@ -398,7 +399,7 @@ def create_things(cli):
 
 def send_messages(cli):
     """
-    Send messages through the AWS IoT service from the previously created 
+    Send messages through the AWS IoT service from the previously created
     number of Things.
     """
     _init(cli)
@@ -443,7 +444,7 @@ def send_messages(cli):
 
 def clean_up(cli):
     """
-    Clean up all Things previously created in the AWS IoT Service and files 
+    Clean up all Things previously created in the AWS IoT Service and files
     stored locally.
     """
     _init(cli)
