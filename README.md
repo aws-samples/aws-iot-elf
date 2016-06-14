@@ -175,6 +175,12 @@ To send a JSON payload as a message read from a file named `example.json`, type:
 ...iot-elf:INFO - ELF thing_0 posting message:'{'some': 'thing', 'another': 'thing', 'ts': '1465257134.82'}' on topic: elf/thing_0
 ```
 
+To send a JSON payload as a `thing_0` shadow update read from a file named `example-shadow.json`, type:
+```
+$ python elf.py send --json-message example-shadow.json --topic '$aws/things/thing_0/shadow/update'
+```
+**Note:** The quotes around the `--topic` value are important, otherwise the `$aws` portion of the value will possibly be interpreted as a shell variable.
+
 #### Clean Thing(s)
 Using the `clean` command will invoke the [`clean_up(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L447) function with the given command line arguments. This will remove all resources that were created by ELF in the AWS IoT service and on the local file system. 
 
