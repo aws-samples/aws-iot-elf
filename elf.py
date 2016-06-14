@@ -277,7 +277,9 @@ class ElfPoster(threading.Thread):
     def on_connect(self, mqttc, userdata, flags, msg):
         log.info("[on_connect] {0}: Connected with result: {1}".format(
             self.thing_name, msg))
-        self.mqttc.subscribe("$aws/events/#")
+        self.mqttc.subscribe("$aws/events/#", qos=1)
+        # subscribe to shadow responses - in case topic is a shadow update
+        self.mqttc.subscribe("$aws/things/#", qos=1)
 
     def on_disconnect(self, mqttc, userdata, rc):
         log.info("[on_disconnect] {0}: Disconnected result: {2}".format(
@@ -299,7 +301,7 @@ class ElfPoster(threading.Thread):
             if self.json_message is None:
                 msg['msg'] = "{0}".format(self.message)
             else:
-                msg['msg'] = _get_json_message(self.json_message)
+                msg.update(_get_json_message(self.json_message))
 
             # publish a JSON equivalent of this Thing's message with a
             # timestamp
