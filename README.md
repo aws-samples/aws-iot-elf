@@ -108,7 +108,7 @@ The AWS IoT ELF uses the following defaults:
 - send message duration: `10 seconds`
 
 #### Create Thing(s)
-Using the `clean` command will invoke the [`create_things(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L325) function with the given command line arguments.
+Using the `clean` command will invoke the [`create_things(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L328) function with the given command line arguments.
 
 To create a given number of Things (eg. `3`) in the AWS IoT service in a specific region, type:
 ```
@@ -158,7 +158,7 @@ $ python elf.py create
 ```
 
 #### Send Messages
-Using the `send` command will invoke the [`send_messages(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L399) function with the given command line arguments.
+Using the `send` command will invoke the [`send_messages(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L402) function with the given command line arguments.
 
 To send a specific message on a specific topic for a specified duration in another region, type:
 ```
@@ -171,12 +171,12 @@ To send a JSON payload as a message read from a file named `example.json`, type:
 ```
 ...which will result in messages being sent as shown in the example output:
 ```
-...iot-elf:INFO - ELF thing_0 posting message:'{'msg': {u'some': u'thing', u'another': u'thing'}, 'ts': '1465257133.82'}' on topic: elf/thing_0
-...iot-elf:INFO - ELF thing_0 posting message:'{'msg': {u'some': u'thing', u'another': u'thing'}, 'ts': '1465257134.82'}' on topic: elf/thing_0
+...iot-elf:INFO - ELF thing_0 posting message:'{'some': 'thing', 'another': 'thing', 'ts': '1465257133.82'}' on topic: elf/thing_0
+...iot-elf:INFO - ELF thing_0 posting message:'{'some': 'thing', 'another': 'thing', 'ts': '1465257134.82'}' on topic: elf/thing_0
 ```
 
 #### Clean Thing(s)
-Using the `clean` command will invoke the [`clean_up(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L444) function with the given command line arguments. This will remove all resources that were created by ELF in the AWS IoT service and on the local file system. 
+Using the `clean` command will invoke the [`clean_up(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L447) function with the given command line arguments. This will remove all resources that were created by ELF in the AWS IoT service and on the local file system. 
 
 To clean up all previously created resources, type:
 ```
