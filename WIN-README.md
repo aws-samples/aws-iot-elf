@@ -30,6 +30,10 @@ Just browse to [git-scm](https://git-scm.com/download/win) and the Windows insta
 Once the download is complete, launch the installation executable. The rest of the AWS IoT ELF getting started guide assumes Git for Windows is installed using the defaults since they are usually fine for most people.
 
 ### Installing `virtualenv`
-Now to keep the AWS IoT ELF python dependencies separate, you probably want to [install](https://virtualenv.pypa.io/en/stable/installation/) `virtualenv`. This can be done simply by using `pip` which was installed when you installed Python. Change to the `~\dev` directory and enter `pip install virtualenv`. 
+Now to keep the AWS IoT ELF python dependencies separate, you probably want to [install](https://virtualenv.pypa.io/en/stable/installation/) `virtualenv`. This can be done simply by using `pip` which was installed when you installed Python. Change to the `~\dev` directory and enter:
+
+```
+pip install virtualenv
+``` 
 
 You now have the necessary development commands available on your Windows-based machine. Now you will want to go back and finish the rest of the non-specific [Getting Started](https://github.com/awslabs/aws-iot-elf).
