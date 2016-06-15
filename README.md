@@ -30,29 +30,31 @@ To clean up all previously created Things, type:
 
 ## Getting Started
 
-To get this example working with Python 2.7+. First clone this repo to your local machine.
+To get this example working with Python 2.7.11+ on a flavor of UNIX or Mac OS. First ensure you have Pytohn 2.7.11 on your machine by executing this command line command `python --version`. If you don't have Python locally, [homebrew](http://brew.sh/) can help you get the latest Python on Mac OS; [Python.org](https://www.python.org/downloads/source/) can start you off for Python on Linux/UNIX flavors. If you're starting out on Windows, follow the [Windows Getting Started](../WIN-README.md) and return to this point after completion.
+
+Now with a working Python and Git installation, clone this repo to your local machine.
 ```
-$ cd ~
-$ mkdir dev
-$ cd ~/dev
-$ git clone https://github.com/awslabs/aws-iot-elf.git
+  cd ~
+  mkdir dev
+  cd ~/dev
+  git clone https://github.com/awslabs/aws-iot-elf.git
 ```
 This will create a local folder `~/dev/aws-iot-elf`.
 
 To keep the AWS IoT ELF python dependencies separate, you probably want to [install](https://virtualenv.pypa.io/en/stable/) `virtualenv`. If you choose to install `virtualenv` then create a virtual environment:
 ```
-$ cd ~/dev/aws-iot-elf
-$ virtualenv venv
+  cd ~/dev/aws-iot-elf
+  virtualenv venv
 ```
 ...and then activate that virtual environment
 ```
-$ source ~/dev/aws-iot-elf/venv/bin/activate
+  source ~/dev/aws-iot-elf/venv/bin/activate
 ```
 
 Now install the AWS IoT ELF dependencies into your local environment using these commands: 
 ```
-(venv)$ cd ~/dev/aws-iot-elf
-(venv)$ pip install -r requirements.txt
+  cd ~/dev/aws-iot-elf
+  pip install -r requirements.txt
 ```
 Next, [install](http://docs.aws.amazon.com/cli/latest/userguide/installing.html) and [configure](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html) the AWS CLI.
 
@@ -90,9 +92,9 @@ When you configure the AWS CLI, the API Keys you install as the default profile 
 }
 ```
 
-Now to [Authenticate with AWS IoT](http://docs.aws.amazon.com/iot/latest/developerguide/identity-in-iot.html) using Server Authentication you will need to download the [Verisign root CA](https://www.symantec.com/content/en/us/enterprise/verisign/roots/VeriSign-Class%203-Public-Primary-Certification-Authority-G5.pem) and save it as a file `aws-iot-rootCA.crt`, or simply execute this command in the same directory as `elf.py`.
+Now to [Authenticate with AWS IoT](http://docs.aws.amazon.com/iot/latest/developerguide/identity-in-iot.html) using Server Authentication you will need to download the [Verisign root CA](https://www.symantec.com/content/en/us/enterprise/verisign/roots/VeriSign-Class%203-Public-Primary-Certification-Authority-G5.pem) and save it as a file `aws-iot-rootCA.crt`, or if you are on Linux / UNIX / MacOS simply execute this command in the same directory as `elf.py`.
 ```
-(venv)$ curl -o aws-iot-rootCA.crt https://www.symantec.com/content/en/us/enterprise/verisign/roots/VeriSign-Class%203-Public-Primary-Certification-Authority-G5.pem
+  curl -o aws-iot-rootCA.crt https://www.symantec.com/content/en/us/enterprise/verisign/roots/VeriSign-Class%203-Public-Primary-Certification-Authority-G5.pem
 ```
 
 Lastly, you will probably want to read through the Troubleshooting section at the bottom of these instructions, just in case you experience a bump. 
@@ -142,7 +144,7 @@ When looking through the `create_thing(cli)` function, the core of the `create` 
         thingName=t_name, principal=keys_cert['certificateArn'])
 ...
 ```
-Everything else around this code is to prepare for, or record the results of, the invocation of these functions.
+Everything else around this code is to prepare for, or record the results of, the invocation of these functions. Note: The thing policy is created and attached in the `send` step.
 
 Lastly, when you run the `create` command you can see in the example output below that a thing named `thing_0` was created and associated with a certificate in region `us-west-2`.
 ```
