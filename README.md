@@ -30,7 +30,7 @@ To clean up all previously created Things, type:
 
 ## Getting Started
 
-To get this example working with Python 2.7.11+ on a flavor of UNIX or Mac OS. First ensure you have Pytohn 2.7.11 on your machine by executing this command line command `python --version`. If you don't have Python locally, [homebrew](http://brew.sh/) can help you get the latest Python on Mac OS; [Python.org](https://www.python.org/downloads/source/) can start you off for Python on Linux/UNIX flavors. If you're starting out on Windows, follow the [Windows Getting Started](../WIN-README.md) and return to this point after completion.
+To get this example working with Python 2.7.11+ on a flavor of UNIX or Mac OS. First ensure you have Pytohn 2.7.11 on your machine by executing this command line command `python --version`. If you don't have Python locally, [homebrew](http://brew.sh/) can help you get the latest Python on Mac OS; [Python.org](https://www.python.org/downloads/source/) can start you off for Python on Linux/UNIX flavors. If you're starting out on Windows, follow the [Windows Getting Started](../master/WIN-README.md) and return to this point after completion.
 
 Now with a working Python and Git installation, clone this repo to your local machine.
 ```
