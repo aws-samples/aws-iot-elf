@@ -50,6 +50,10 @@ To keep the AWS IoT ELF python dependencies separate, you probably want to [inst
 ```
   source ~/dev/aws-iot-elf/venv/bin/activate
 ```
+...or on Windows
+```
+  .\venv\Scripts\activate
+```
 
 Now install the AWS IoT ELF dependencies into your local environment using these commands: 
 ```
