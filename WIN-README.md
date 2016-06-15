@@ -14,13 +14,13 @@ Once the download is complete, launch the installation executable. Most likely y
 **Note:** The rest of this guide's instructions assume you will install into a `dev` directory inside your `<user_id>` directory. Furthermore, the directory `C:\Users\<user_id>` will be referred to as `~` for the remainder of this and the main Getting Started documents.
 
 Now, make sure the installer adds the Python executable to the Path. This dialog:
-```
+
 ![Image](../blob/master/docs/Python-install-add-to-path.PNG?raw=true)
-```
+
 ..should look like this dialog. 
-```
+
 ![Image](../blob/master/docs/Python-install-add-to-path-selected.PNG?raw=true)
-```
+
 
 Push `Next` until the Python installation is complete. 
 
