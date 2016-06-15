@@ -9,23 +9,23 @@ The **AWS IoT ELF** python example client demonstrates how one can **Create** Th
 #### Create Thing(s)
 Once the *getting started* guide below has been completed, to create a single Thing in the AWS IoT service, simply type:
 ```
-(venv)$ python elf.py create
+  python elf.py create
 ```
 To create a given number of Things (eg. `3`) in the AWS IoT service, type:
 ```
-(venv)$ python elf.py create 3
+  python elf.py create 3
 ```
 
 #### Send Messages
 To send messages using previously created Things, type:
 ```
-(venv)$ python elf.py send
+  python elf.py send
 ```
 
 #### Clean Thing(s)
 To clean up all previously created Things, type:
 ```
-(venv)$ python elf.py clean
+  python elf.py clean
 ```
 
 ## Getting Started
@@ -58,7 +58,7 @@ Now install the AWS IoT ELF dependencies into your local environment using these
 ```
 Next, [install](http://docs.aws.amazon.com/cli/latest/userguide/installing.html) and [configure](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html) the AWS CLI.
 
-When you configure the AWS CLI, the API Keys you install as the default profile or a [named profile](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-multiple-profiles) should have at least the following privileges in an associated IAM policy:
+When you configure the AWS CLI, the API Keys you install as the default profile or as a [named profile](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-multiple-profiles) should have at least the following privileges in an associated IAM policy:
 ```json
 {
     "Version": "2012-10-17",
