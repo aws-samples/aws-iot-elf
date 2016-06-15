@@ -15,11 +15,11 @@ Once the download is complete, launch the installation executable. Most likely y
 
 Now, make sure the installer adds the Python executable to the Path. This dialog:
 ```
-<screenshot>
+![Image](../blob/master/docs/Python-install-add-to-path.PNG?raw=true)
 ```
 ..should look like this dialog. 
 ```
-<screenshot_2>
+![Image](../blob/master/docs/Python-install-add-to-path-selected.PNG?raw=true)
 ```
 
 Push `Next` until the Python installation is complete. 
