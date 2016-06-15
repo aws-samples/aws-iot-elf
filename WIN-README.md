@@ -1,6 +1,7 @@
 ## aws-iot-elf Windows Getting Started
 
-To get this example working with Python 2.7.11+ on Windows. You will want to:
+To get this AWS IoT ELF exmaple working with Python 2.7.11+ on Windows. You will want to:
+
 1. install Python 2.7.11+ to run ELF,
 2. install Git to interact with ELF's source code repository, and... 
 3. install `virtualenv` to keep this Python project running separate from other future projects.
@@ -31,4 +32,4 @@ Once the download is complete, launch the installation executable. The rest of t
 ### Installing `virtualenv`
 Now to keep the AWS IoT ELF python dependencies separate, you probably want to [install](https://virtualenv.pypa.io/en/stable/installation/) `virtualenv`. This can be done simply by using `pip` which was installed when you installed Python. Change to the `~\dev` directory and enter `pip install virtualenv`. 
 
-You now have the necessary development commands available to you on your Windows-based machine.
+You now have the necessary development commands available on your Windows-based machine. Now you will want to go back and finish the rest of the non-specific [Getting Started](https://github.com/awslabs/aws-iot-elf).
