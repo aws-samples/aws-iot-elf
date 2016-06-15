@@ -36,4 +36,4 @@ Now to keep the AWS IoT ELF python dependencies separate, you probably want to [
 pip install virtualenv
 ``` 
 
-You now have the necessary development commands available on your Windows-based machine. Now you will want to go back and finish the rest of the non-specific [Getting Started](https://github.com/awslabs/aws-iot-elf).
+You now have the necessary development commands installed on your Windows-based machine. Now you will want to go back and finish the rest of the non-specific [Getting Started](https://github.com/awslabs/aws-iot-elf).
