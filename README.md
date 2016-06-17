@@ -105,7 +105,7 @@ Lastly, you will probably want to read through the Troubleshooting section at th
 
 To validate the AWS IoT ELF is setup correctly, execute `python elf.py create` and `python elf.py clean`. You should not see any errors.
 
-Congratulations! The ELF and a minimal development environment is now configured on your machine.
+Congratulations! The ELF and a minimal development environment are now configured on your machine.
 
 ## Detailed Help
 #### Defaults
