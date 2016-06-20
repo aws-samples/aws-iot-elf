@@ -284,5 +284,5 @@ Related Resources
 -----------------
 * [AWS IoT Getting Started](http://docs.aws.amazon.com/kinesis/latest/dev/introduction.html)  
 * [AWS SDK for Python](http://aws.amazon.com/sdkforpython)
-* [Paho MQTT](http://eclipse.org/paho/)
+* [AWS IoT Device SDK for Python](https://github.com/aws/aws-iot-device-sdk-python)
 * [Apache 2.0 License](http://aws.amazon.com/apache2.0)
