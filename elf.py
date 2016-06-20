@@ -28,7 +28,9 @@ from boto3.session import Session
 from botocore.exceptions import ClientError
 from random import choice
 from string import lowercase
-import paho.mqtt.client as paho
+
+# from AWS IoT SDK @ https://github.com/aws/aws-iot-device-sdk-python
+from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient, DROP_OLDEST
 
 
 log = logging.getLogger('iot-elf')
@@ -197,9 +199,7 @@ class ElfPoster(threading.Thread):
     The thread that repeatedly posts records to a topic for a given Thing.
     """
 
-    def __init__(
-        self, thing_name, cli, thing, cfg, args=(), kwargs={}
-    ):
+    def __init__(self, thing_name, cli, thing, cfg, args=(), kwargs={}):
         super(ElfPoster, self).__init__(
             name=thing_name, args=args, kwargs=kwargs
         )
@@ -217,6 +217,7 @@ class ElfPoster(threading.Thread):
         self.cfg = cfg
         self.post_duration = cli.duration
         self.aws_iot = _get_iot_session(self.region, cli.profile_name)
+        self.message_qos = cli.qos
 
         if policy_name_key not in thing.keys():
             policy_name, policy_arn = _create_and_attach_policy(
@@ -241,53 +242,27 @@ class ElfPoster(threading.Thread):
         # client.
         cid = elf_id.urn.split(":")[2] + "_" + make_string(3)
 
-        self.mqttc = paho.Client(client_id=cid)
+        self.mqttc = AWSIoTMQTTClient(clientID=cid)
 
         t_name = cfg_dir + thing_name_template.format(0)
-        self.mqttc.on_connect = self.on_connect
-        self.mqttc.on_disconnect = self.on_disconnect
-        self.mqttc.on_log = self.on_log
-        self.mqttc.on_message = self.on_message
-
-        # Setup the correct certificates and protocol version to communicate
-        # with AWS IoT
-        self.mqttc.tls_set(
-            ca_certs=self.root_cert,
-            certfile=t_name + ".pem",
-            keyfile=t_name + ".prv",
-            tls_version=ssl.PROTOCOL_TLSv1_2
-        )
         endpoint = self.aws_iot.describe_endpoint()
         log.info("ELF connecting asynchronously to IoT endpoint:'{0}'".format(
             endpoint['endpointAddress']))
-        self.mqttc.connect_async(
-            host=endpoint['endpointAddress'],
-            port=AWS_IOT_MQTT_PORT,
-            keepalive=10
+        self.mqttc.configureEndpoint(
+            hostName=endpoint['endpointAddress'], portNumber=AWS_IOT_MQTT_PORT
         )
-        time.sleep(1)
-        self.mqttc.loop_start()
+        self.mqttc.configureCredentials(
+            CAFilePath=self.root_cert,
+            KeyPath=t_name + ".prv",
+            CertificatePath=t_name + ".pem"
+        )
+        self.mqttc.configureAutoReconnectBackoffTime(1, 128, 20)
+        self.mqttc.configureOfflinePublishQueueing(90, DROP_OLDEST)
+        self.mqttc.configureDrainingFrequency(3)
+        self.mqttc.configureConnectDisconnectTimeout(20)
+        self.mqttc.configureMQTTOperationTimeout(5)
 
-    # The callback used when a PUBLISH message is received from the server.
-    def on_message(self, mqttc, userdata, msg):
-        log.info("[on_message] {0}: topic:{1} msg:{2}".format(
-            self.thing_name, msg.topic, str(msg.payload)))
-
-    # The callback used when the client connects with the MQTT broker
-    def on_connect(self, mqttc, userdata, flags, msg):
-        log.info("[on_connect] {0}: Connected with result: {1}".format(
-            self.thing_name, msg))
-        self.mqttc.subscribe("$aws/events/#", qos=1)
-        # subscribe to shadow responses - in case topic is a shadow update
-        self.mqttc.subscribe("$aws/things/#", qos=1)
-
-    def on_disconnect(self, mqttc, userdata, rc):
-        log.info("[on_disconnect] {0}: Disconnected result: {2}".format(
-            self.thing_name, userdata, rc))
-
-    def on_log(self, mqttc, userdata, level, msg):
-        log.debug("[on_log] {0}: Log level: {1} message:'{2}'".format(
-            self.thing_name, level, msg))
+        self.mqttc.connect()  # keepalive default at 30 seconds
 
     # The thread that does the actual message sending for the desired duration
     def run(self):
@@ -308,7 +283,7 @@ class ElfPoster(threading.Thread):
             send = json.dumps(msg, separators=(', ', ': '))
             log.info("ELF {0} posting message: {1} on topic: {2}".format(
                 self.thing_name, send, self.topic))
-            self.mqttc.publish(self.topic, send)
+            self.mqttc.publish(self.topic, send, self.message_qos)
 
 
 def _init(cli):
@@ -442,6 +417,10 @@ def send_messages(cli):
     # wait for all the ElfPoster threads to finish their post_duration
     for ep in ep_list:
         ep.join()
+
+    # Now disconnect the MQTT Client
+    for ep in ep_list:
+        ep.mqttc.disconnect()
 
 
 def clean_up(cli):
@@ -580,6 +559,9 @@ if __name__ == '__main__':
     send.add_argument(
         '--duration', dest='duration', type=int, default=10,
         help='The messages will be sent once a second for <duration> seconds.')
+    send.add_argument(
+        '--qos', dest="qos", type=int, default=0,
+        help='The Quality of Service (QoS) to use when sending messages')
     send.set_defaults(func=send_messages)
 
     clean = subparsers.add_parser(
