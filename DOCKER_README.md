@@ -21,4 +21,4 @@ A few more notes to get started with your ELF Docker image:
 - Once the container is launched, ELF is located in '/root/aws-iot-elf', and can be launched via
 ```python /root/aws-iot-elf/elf.py COMMAND```
 
-You now have the necessary development commands configured in your ELF Docker image. Continue on and finish the rest of the non-specific [Getting Started](https://github.com/awslabs/aws-iot-elf).
+You now have the necessary development commands configured in your ELF Docker image. Continue on and finish the rest of the non-specific [Getting Started](../master/README.md).
