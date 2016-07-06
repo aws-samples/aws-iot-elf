@@ -18,6 +18,7 @@ A few more notes to get started with your ELF Docker image:
 - The access key credentials provided must be associated with an IAM policy that matches the permissions detailed in the  [Getting Started](https://github.com/awslabs/aws-iot-elf)
 - ELF is a CLI tool, so the ELF container should be launched in interactive mode using the '-it' flags
 - ELF stores information about the resources created locally (in the container's file system, in this case), so either make sure to clean up the resources you create before terminating the container, or stop the container instead of terminating it. Otherwise, you will need to manually clean up resources created by ELF.
-- Once the container is launched, ELF is located in '/root/aws-iot-elf', and can be launched via 'python /root/aws-iot-elf/elf.py COMMAND'
+- Once the container is launched, ELF is located in '/root/aws-iot-elf', and can be launched via
+```python /root/aws-iot-elf/elf.py COMMAND```
 
 You now have the necessary development commands configured in your ELF Docker image. Continue on and finish the rest of the non-specific [Getting Started](https://github.com/awslabs/aws-iot-elf).
