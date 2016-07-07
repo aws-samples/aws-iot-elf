@@ -4,7 +4,7 @@ An AWS IoT python example client that strives to be Extremely Low Friction (ELF)
 
 ## Overview
 
-The **AWS IoT ELF** python example client demonstrates how one can **Create** Things, **Send** messages to Things, and **Clean** up Things in the AWS IoT service using the AWS SDK for Python (aka. `boto3`). This example also demonstrates how to bring together `boto3` and the standard AWS IoT Device client in a straightforward fashion.
+The **AWS IoT ELF** python example client demonstrates how one can **Create** Things, **Send** messages to Things, **Subscribe** to topics to receive messages from Things, and **Clean** up Things in the AWS IoT service using the AWS SDK for Python (aka. `boto3`). This example also demonstrates how to bring together `boto3` and the standard AWS IoT Device client in a straightforward fashion.
 
 #### Create Thing(s)
 Once the *getting started* guide below has been completed, to create a single Thing in the AWS IoT service, simply type:
@@ -20,6 +20,12 @@ To create a given number of Things (eg. `3`) in the AWS IoT service, type:
 To send messages using previously created Things, type:
 ```
   python elf.py send
+```
+
+#### Subscribe to Topics
+To receive messages from a topic, type:
+```
+  python elf.py subscribe
 ```
 
 #### Clean Thing(s)
@@ -114,9 +120,10 @@ The AWS IoT ELF uses the following defaults:
 - MQTT topic: `elf/<thing_#>`
 - message: `IoT ELF Hello`
 - send message duration: `10 seconds`
+- topic subscription duration: `30 seconds`
 
 #### Create Thing(s)
-Using the `clean` command will invoke the [`create_things(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L328) function with the given command line arguments.
+Using the `clean` command will invoke the [`create_things(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L303) function with the given command line arguments.
 
 To create a given number of Things (eg. `3`) in the AWS IoT service in a specific region, type:
 ```
@@ -166,7 +173,7 @@ $ python elf.py create
 ```
 
 #### Send Messages
-Using the `send` command will invoke the [`send_messages(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L402) function with the given command line arguments.
+Using the `send` command will invoke the [`send_messages(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L377) function with the given command line arguments.
 
 To send a specific message on a specific topic for a specified duration in another region, type:
 ```
@@ -190,7 +197,7 @@ $ python elf.py send --json-message example-shadow.json --topic '$aws/things/thi
 **Note:** The quotes around the `--topic` value are important, otherwise the `$aws` portion of the value will possibly be interpreted as a shell variable.
 
 #### Clean Thing(s)
-Using the `clean` command will invoke the [`clean_up(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L447) function with the given command line arguments. This will remove all resources that were created by ELF in the AWS IoT service and on the local file system. 
+Using the `clean` command will invoke the [`clean_up(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L426) function with the given command line arguments. This will remove all resources that were created by ELF in the AWS IoT service and on the local file system. 
 
 To clean up all previously created resources, type:
 ```
