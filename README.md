@@ -36,7 +36,7 @@ To clean up all previously created Things, type:
 
 ## Getting Started
 
-To get this example working with Python 2.7.11+ on a flavor of UNIX or Mac OS. First ensure you have Python 2.7.11 on your machine by executing this command line command `python --version`. If you don't have Python locally, [homebrew](http://brew.sh/) can help you get the latest Python on Mac OS; [Python.org](https://www.python.org/downloads/source/) can start you off for Python on Linux/UNIX flavors. If you're starting out on Windows, follow the [Windows Getting Started](../master/WIN-README.md) and return to this point after completion.
+To get this example working with Python 2.7.11+ on a flavor of UNIX or Mac OS. First ensure you have Python 2.7.11 on your machine by executing this command line command `python --version`. If you don't have Python locally, [homebrew](http://brew.sh/) can help you get the latest Python on Mac OS; [Python.org](https://www.python.org/downloads/source/) can start you off for Python on Linux/UNIX flavors. If you're starting out on Windows, follow the [Windows Getting Started](../master/WIN-README.md) and return to this point after completion. Alternatively, ELF can be run as a Docker container; instructions for building an ELF Docker image can be found in the [Docker Getting Started](../master/DOCKER_README.md).
 
 Now with a working Python and Git installation, clone this repo to your local machine.
 ```
@@ -61,7 +61,7 @@ To keep the AWS IoT ELF python dependencies separate, you probably want to [inst
   .\venv\Scripts\activate
 ```
 
-Now install the AWS IoT ELF dependencies into your local environment using these commands: 
+Now install the AWS IoT ELF dependencies into your local environment using these commands:
 ```
   cd ~/dev/aws-iot-elf
   pip install -r requirements.txt
@@ -107,7 +107,7 @@ Now to [Authenticate with AWS IoT](http://docs.aws.amazon.com/iot/latest/develop
   curl -o aws-iot-rootCA.crt https://www.symantec.com/content/en/us/enterprise/verisign/roots/VeriSign-Class%203-Public-Primary-Certification-Authority-G5.pem
 ```
 
-Lastly, you will probably want to read through the Troubleshooting section at the bottom of these instructions, just in case you experience a bump. 
+Lastly, you will probably want to read through the Troubleshooting section at the bottom of these instructions, just in case you experience a bump.
 
 To validate the AWS IoT ELF is setup correctly, execute `python elf.py create` and `python elf.py clean`. You should not see any errors.
 
@@ -197,7 +197,11 @@ $ python elf.py send --json-message example-shadow.json --topic '$aws/things/thi
 **Note:** The quotes around the `--topic` value are important, otherwise the `$aws` portion of the value will possibly be interpreted as a shell variable.
 
 #### Clean Thing(s)
+<<<<<<< HEAD
 Using the `clean` command will invoke the [`clean_up(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L426) function with the given command line arguments. This will remove all resources that were created by ELF in the AWS IoT service and on the local file system. 
+=======
+Using the `clean` command will invoke the [`clean_up(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L447) function with the given command line arguments. This will remove all resources that were created by ELF in the AWS IoT service and on the local file system.
+>>>>>>> e3db095222b70e22aec0b05cbe7232c07e519d74
 
 To clean up all previously created resources, type:
 ```
@@ -238,7 +242,7 @@ When looking through the `clean_up(cli)` function, the core of the `clean` comma
 All steps prior to `delete_thing` are required, in order to detach and clean up a fully functional and authorized Thing.
 
 #### Help
-For additional detailed help and configuration options, enter: 
+For additional detailed help and configuration options, enter:
 ```
 (venv)$ python elf.py --help
 ..or..
@@ -260,29 +264,29 @@ elf.py: error: unrecognized arguments: --region us-east-1
 
 **Q:** I seem to need to upgrade my `openssl` and `python` installations. Why?
 
-**A:** A version of [Python 2.7 ssl](https://docs.python.org/2/library/ssl.html) with support for Open SSL 1.0.1 is necessary to support the security posture (and specifically [TLSv1_2](https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_1.2)) required by the AWS IoT service. 
+**A:** A version of [Python 2.7 ssl](https://docs.python.org/2/library/ssl.html) with support for Open SSL 1.0.1 is necessary to support the security posture (and specifically [TLSv1_2](https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_1.2)) required by the AWS IoT service.
 
 **Q:** When I try to send messages, I see a `ResourceAlreadyExistsException` similar to the following. What might be wrong?
 ```
 ...example...
-botocore.exceptions.ClientError: An error occurred (ResourceAlreadyExistsException) when calling the 
+botocore.exceptions.ClientError: An error occurred (ResourceAlreadyExistsException) when calling the
 CreatePolicy operation: Policy cannot be created - name already exists (name=policy-thing_0)
 ```
-**A:** In this example exception, for some reason the policy name `policy-thing_0` already exists and is colliding with the new policy to be created and applied to the Thing. The old existing policy needs to be [Detached](http://docs.aws.amazon.com/cli/latest/reference/iot/detach-principal-policy.html) and [Deleted](http://docs.aws.amazon.com/cli/latest/reference/iot/delete-policy.html) manually using the AWS CLI or AWS IoT Console. 
+**A:** In this example exception, for some reason the policy name `policy-thing_0` already exists and is colliding with the new policy to be created and applied to the Thing. The old existing policy needs to be [Detached](http://docs.aws.amazon.com/cli/latest/reference/iot/detach-principal-policy.html) and [Deleted](http://docs.aws.amazon.com/cli/latest/reference/iot/delete-policy.html) manually using the AWS CLI or AWS IoT Console.
 
 **Q:** When I try to `create`, `send`, or `clean`, I see an `AccessDeniedException` similar to the following. What might be wrong?
 ```
 ...example...
-botocore.exceptions.ClientError: An error occurred (AccessDeniedException) when calling the 
-CreateKeysAndCertificate operation: User: arn:aws:iam::XXXXXXYYYYYY:user/elf is not 
+botocore.exceptions.ClientError: An error occurred (AccessDeniedException) when calling the
+CreateKeysAndCertificate operation: User: arn:aws:iam::XXXXXXYYYYYY:user/elf is not
 authorized to perform: iot:CreateKeysAndCertificate
 ```
-**A:** In this example exception, the user `elf` does not have enough privilege to perform the `iot:CreateKeysAndCertificate` action on the AWS IoT service. Make sure the privileges as described in the *Getting Started* section are associated with the user or `--profile` (and specifically the API keys) experiencing the exception. 
+**A:** In this example exception, the user `elf` does not have enough privilege to perform the `iot:CreateKeysAndCertificate` action on the AWS IoT service. Make sure the privileges as described in the *Getting Started* section are associated with the user or `--profile` (and specifically the API keys) experiencing the exception.
 
 **Q:** When I try to `send` messages using my recently created Things, I see a `ResourceNotFoundException` similar to the following. What might be wrong?
 ```
 ...example...
-botocore.exceptions.ClientError: An error occurred (ResourceNotFoundException) when calling the 
+botocore.exceptions.ClientError: An error occurred (ResourceNotFoundException) when calling the
 AttachPrincipalPolicy operation: The certificate given in the principal does not exist.
 ```
 **A:** In this example exception, the certificate recorded into the AWS IoT ELF config file does not exist in the region. Most likely the `create` command was called with a `--region` option that is not the same as the `--region` used when calling the `send` command.
