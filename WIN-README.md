@@ -7,7 +7,7 @@ To get this AWS IoT ELF example working with Python 2.7.11+ on Windows, you will
 3. install `virtualenv` to keep this Python project running separate from other future projects.
 
 ### Installing `python`
-Borwse to the [latest python release](https://www.python.org/downloads/windows/) and click *"Latest Python 2 Release"* to get to the download page with the correct Windows installer for your machine.
+Browse to the [latest python release](https://www.python.org/downloads/windows/) and click *"Latest Python 2 Release"* to get to the download page with the correct Windows installer for your machine.
 
 Once the download is complete, launch the installation executable. Most likely you want to select *Install for All Users*. Then enter a directory: `C:\Users\<user_id>\dev\Python27\` (or equivalent).
 
