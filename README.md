@@ -141,7 +141,7 @@ To create a single Thing in the AWS IoT service in a specific region using a dif
   python elf.py --region <region_name> --profile <profile_name> create
 ```
 
-Calling the `create` command with a `--region` and/or `--profile` CLI option means that the Things will be created in that region and will use the corresponding AWS CLI [named profile](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-multiple-profiles) API Key and Secret Key pair. Additional `send` and `clean` commands should use the same options. In this way the AWS IoT ELF will send messages to the same region and with the same profile used to `create` the Things in the first place. Once `clean` is called successfully, different `--region` and/or `--profile` option values can be used to orient the AWS IoT ELF differently.
+Calling the `create` command with a `--region` and/or `--profile` CLI option means that the Things will be created in that region and will use the corresponding AWS CLI [named profile](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-multiple-profiles) API Key and Secret Key pair. Additional `send`, `subscribe`, and `clean` commands should use the same options. In this way the AWS IoT ELF will send messages to the same region and with the same profile used to `create` the Things in the first place. Once `clean` is called successfully, different `--region` and/or `--profile` option values can be used to orient the AWS IoT ELF differently.
 
 When looking through the `create_thing(cli)` function, the core of the `create` command is shown in these lines of code:
 ```python
