@@ -123,7 +123,7 @@ The AWS IoT ELF uses the following defaults:
 - topic subscription duration: `30 seconds`
 
 #### Create Thing(s)
-Using the `clean` command will invoke the [`create_things(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L303) function with the given command line arguments.
+Using the `clean` command will invoke the [`create_things(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L331) function with the given command line arguments.
 
 To create a given number of Things (eg. `3`) in the AWS IoT service in a specific region, type:
 ```
@@ -173,7 +173,7 @@ $ python elf.py create
 ```
 
 #### Send Messages
-Using the `send` command will invoke the [`send_messages(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L377) function with the given command line arguments.
+Using the `send` command will invoke the [`send_messages(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L405) function with the given command line arguments.
 
 To send a specific message on a specific topic for a specified duration in another region, type:
 ```
@@ -197,7 +197,7 @@ To send a JSON payload as a `thing_0` shadow update read from a file named `exam
 **Note:** The quotes around the `--topic` value are important, otherwise the `$aws` portion of the value will possibly be interpreted as a shell variable.
 
 #### Subscribe to Topic(s)
-Using the `subscribe` command will invoke the [`subscribe(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L400) function with the given command line arguments. 
+Using the `subscribe` command will invoke the [`subscribe(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L454) function with the given command line arguments. 
 
 To subscribe to messages at the default topic root of `elf` for a specified duration, type:
 ```
@@ -217,15 +217,14 @@ To send messages from ELF Y to ELF X through the AWS IoT service, open two comma
 ```
   python elf.py send --duration 15
 ```
-...which, in a matter of seconds, will result in messages shown in the ELF X window similar to this example output:
+...which, in a matter of seconds, will result in messages shown in the **ELF X** window similar to this example output:
 ```
-...iot-elf:INFO - Received message: {"msg": "IoT ELF Hello", "ts": "1468604633.27"} from topic: elf/thing_0
 ...iot-elf:INFO - Received message: {"msg": "IoT ELF Hello", "ts": "1468604634.27"} from topic: elf/thing_0
 ...iot-elf:INFO - Received message: {"msg": "IoT ELF Hello", "ts": "1468604635.28"} from topic: elf/thing_0
 ```
 
 #### Clean Thing(s)
-Using the `clean` command will invoke the [`clean_up(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L426) function with the given command line arguments. This will remove all resources that were created by ELF in the AWS IoT service and on the local file system. 
+Using the `clean` command will invoke the [`clean_up(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L500) function with the given command line arguments. This will remove all resources that were created by ELF in the AWS IoT service and on the local file system. 
 
 To clean up all previously created resources, type:
 ```
@@ -272,6 +271,7 @@ For additional detailed help and configuration options, enter:
 ..or..
   python elf.py create --help
   python elf.py send --help
+  python elf.py subscribe --help
   python elf.py clean --help
 ```
 
