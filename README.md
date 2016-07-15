@@ -120,7 +120,7 @@ The AWS IoT ELF uses the following defaults:
 - MQTT topic: `elf/<thing_#>`
 - message: `IoT ELF Hello`
 - send message duration: `10 seconds`
-- topic subscription duration: `30 seconds`
+- topic subscription duration: `10 seconds`
 
 #### Create Thing(s)
 Using the `clean` command will invoke the [`create_things(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L331) function with the given command line arguments.
