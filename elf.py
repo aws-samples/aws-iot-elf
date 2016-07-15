@@ -194,28 +194,23 @@ def _create_and_attach_policy(region, topic, thing_name, thing_cert_arn, cli):
     return p['policyName'], p['policyArn']
 
 
-class ElfPoster(threading.Thread):
+class ElfThread(threading.Thread):
     """
-    The thread that repeatedly posts records to a topic for a given Thing.
+    The abstract thread that sets up interaction with AWS IoT Things
     """
 
     def __init__(self, thing_name, cli, thing, cfg, args=(), kwargs={}):
-        super(ElfPoster, self).__init__(
+        super(ElfThread, self).__init__(
             name=thing_name, args=args, kwargs=kwargs
         )
         self.thing_name = thing_name
-        self.message = cli.message
-        self.json_message = cli.json_message
         self.thing = thing
         self.root_cert = cli.root_cert
-        if cli.topic == DEFAULT_TOPIC:
-            self.topic = '{0}/{1}'.format(DEFAULT_TOPIC, self.thing_name)
-        else:
-            self.topic = cli.topic
+        self.topic = '{0}/{1}'.format(cli.topic, self.thing_name)
 
         self.region = cli.region
         self.cfg = cfg
-        self.post_duration = cli.duration
+        self.duration = cli.duration
         self.aws_iot = _get_iot_session(self.region, cli.profile_name)
         self.message_qos = cli.qos
 
@@ -227,10 +222,10 @@ class ElfPoster(threading.Thread):
             )
             self.policy_name = policy_name
             self.policy_arn = policy_arn
-            log.debug("[send_messages] attached policy on cert:{0}".format(
+            log.debug("[elf_thread] attached policy on cert:{0}".format(
                 thing['certificateArn']))
         else:
-            log.debug("[send_messages] policy_name:{0} exists.".format(
+            log.debug("[elf_thread] policy_name:{0} exists.".format(
                 policy_name_key))
             self.policy_name = thing[policy_name_key]
             self.policy_arn = thing[policy_arn_key]
@@ -264,10 +259,23 @@ class ElfPoster(threading.Thread):
 
         self.mqttc.connect()  # keepalive default at 30 seconds
 
-    # The thread that does the actual message sending for the desired duration
+
+class ElfPoster(ElfThread):
+    """
+    The thread that does the actual message sending for the desired duration
+    """
+
+    def __init__(self, thing_name, cli, thing, cfg, args=(), kwargs={}):
+        super(ElfPoster, self).__init__(
+            thing_name=thing_name, cli=cli, thing=thing, cfg=cfg, args=args,
+            kwargs=kwargs
+        )
+        self.message = cli.message
+        self.json_message = cli.json_message
+
     def run(self):
         start = datetime.datetime.now()
-        finish = start + datetime.timedelta(seconds=self.post_duration)
+        finish = start + datetime.timedelta(seconds=self.duration)
         while finish > datetime.datetime.now():
             time.sleep(1)  # wait a second between publishing iterations
             msg = {
@@ -281,9 +289,29 @@ class ElfPoster(threading.Thread):
             # publish a JSON equivalent of this Thing's message with a
             # timestamp
             send = json.dumps(msg, separators=(', ', ': '))
-            log.info("ELF {0} posting message: {1} on topic: {2}".format(
-                self.thing_name, send, self.topic))
+            log.info("ELF {0} posted a {1} bytes message: {2} on topic: {3}".format(
+                self.thing_name, len(send.encode("utf8")), send, self.topic))
             self.mqttc.publish(self.topic, send, self.message_qos)
+
+
+class ElfListener(ElfThread):
+    """
+    The thread that subscribes to a topic for the desired duration
+    """
+
+    def listener_callback(self, client, userdata, message):
+        log.info("Received message: {0} from topic: {1}".format(
+            message.payload, message.topic))
+
+    def run(self):
+        self.mqttc.subscribe(self.topic, 1, self.listener_callback)
+        log.info("ELF {0} subscribed on topic: {1}".format(
+            self.thing_name, self.topic))
+
+        start = datetime.datetime.now()
+        finish = start + datetime.timedelta(seconds=self.duration)
+        while finish > datetime.datetime.now():
+            time.sleep(1)  # wait a second between iterations
 
 
 def _init(cli):
@@ -388,7 +416,7 @@ def send_messages(cli):
     duration = cli.duration
     # region = args.region
     log.info(
-        "[send_messages] ELF sending:'{0}' on topic:'{1}' for:{2} secs".format(
+        "[send_messages] ELF sending:'{0}' on topic root:'{1}' for:{2} secs".format(
             message, topic, duration))
 
     cfg = _get_elf_config()
@@ -421,6 +449,52 @@ def send_messages(cli):
     # Now disconnect the MQTT Client
     for ep in ep_list:
         ep.mqttc.disconnect()
+
+
+def subscribe(cli):
+    """
+    Subscribe and output messages from messaging topics for all previously
+    created Things
+    """
+    _init(cli)
+    iot = _get_iot_session(cli.region, cli.profile_name)
+
+    topic = cli.topic
+    duration = cli.duration
+    log.info(
+        "ELF subscribing on topic root:'{0}' for:{1} secs".format(
+            topic, duration))
+
+    cfg = _get_elf_config()
+    things = _get_things_config()
+    if not things:
+        log.info("[subscribe] ELF couldn't find previously created things.")
+        return
+
+    # setup Things and ElfListener threads
+    i = 0
+    el_list = list()
+    for t in things:
+        thing_name = thing_name_template.format(i)
+        thing = t[thing_name]
+        el = ElfListener(thing_name, cli, thing, cfg)
+
+        things[i][thing_name][policy_name_key] = el.policy_name
+        things[i][thing_name][policy_arn_key] = el.policy_arn
+
+        el_list.append(el)
+        el.start()
+        i += 1
+
+    _update_things_config(things)
+
+    # wait for all the ElfListener threads to finish their duration
+    for el in el_list:
+        el.join()
+
+    # Now disconnect the MQTT Client
+    for el in el_list:
+        el.mqttc.disconnect()
 
 
 def clean_up(cli):
@@ -553,7 +627,7 @@ if __name__ == '__main__':
                       help="The JSON content to be included in an ELF message.")
     send.add_argument('--root-cert', dest='root_cert',
                       default="aws-iot-rootCA.crt",
-                      help="The root certificate for the generated credentials")
+                      help="The root certificate for the credentials")
     send.add_argument('--topic', dest='topic', default=DEFAULT_TOPIC,
                       help='The topic to which the message will be sent.')
     send.add_argument(
@@ -563,6 +637,23 @@ if __name__ == '__main__':
         '--qos', dest="qos", type=int, default=0,
         help='The Quality of Service (QoS) to use when sending messages')
     send.set_defaults(func=send_messages)
+
+    subs = subparsers.add_parser(
+        'subscribe',
+        description='Subscribe each created Thing to the topic.')
+    subs.add_argument(
+        '--root-cert', dest='root_cert',
+        default="aws-iot-rootCA.crt",
+        help="The root certificate for the credentials")
+    subs.add_argument('--topic', dest='topic', default=DEFAULT_TOPIC,
+                      help='The topic on which to subscribe.')
+    subs.add_argument(
+        '--duration', dest='duration', type=int, default=10,
+        help='The subscription will listen on the topic for <duration> seconds.')
+    subs.add_argument(
+        '--qos', dest="qos", type=int, default=0,
+        help='The Quality of Service (QoS) to use when subscribed to the topic')
+    subs.set_defaults(func=subscribe)
 
     clean = subparsers.add_parser(
         'clean',
