@@ -127,18 +127,18 @@ Using the `clean` command will invoke the [`create_things(cli)`](https://github.
 
 To create a given number of Things (eg. `3`) in the AWS IoT service in a specific region, type:
 ```
-(venv)$ python elf.py --region <region_name> create 3
+  python elf.py --region <region_name> create 3
 ```
 This command results in three numbered things: `thing_0`, `thing_1`, and `thing_2` being created in `<region_name>`.
 
 To create a single Thing in the AWS IoT service using a different AWS CLI profile, type:
 ```
-(venv)$ python elf.py --profile <profile_name> create
+  python elf.py --profile <profile_name> create
 ```
 
 To create a single Thing in the AWS IoT service in a specific region using a different AWS CLI profile, type:
 ```
-(venv)$ python elf.py --region <region_name> --profile <profile_name> create
+  python elf.py --region <region_name> --profile <profile_name> create
 ```
 
 Calling the `create` command with a `--region` and/or `--profile` CLI option means that the Things will be created in that region and will use the corresponding AWS CLI [named profile](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-multiple-profiles) API Key and Secret Key pair. Additional `send` and `clean` commands should use the same options. In this way the AWS IoT ELF will send messages to the same region and with the same profile used to `create` the Things in the first place. Once `clean` is called successfully, different `--region` and/or `--profile` option values can be used to orient the AWS IoT ELF differently.
@@ -177,12 +177,12 @@ Using the `send` command will invoke the [`send_messages(cli)`](https://github.c
 
 To send a specific message on a specific topic for a specified duration in another region, type:
 ```
-(venv)$ python elf.py --region <region_name> send --topic 'elf/example' --duration <num_seconds> 'Example ELF message'
+  python elf.py --region <region_name> send --topic 'elf/example' --duration <num_seconds> 'Example ELF message'
 ```
 
 To send a JSON payload as a message read from a file named `example.json`, type:
 ```
-(venv)$ python elf.py --region <region_name> send --json-message example.json
+  python elf.py --region <region_name> send --json-message example.json
 ```
 ...which will result in messages being sent as shown in the example output:
 ```
@@ -192,25 +192,49 @@ To send a JSON payload as a message read from a file named `example.json`, type:
 
 To send a JSON payload as a `thing_0` shadow update read from a file named `example-shadow.json`, type:
 ```
-$ python elf.py send --json-message example-shadow.json --topic '$aws/things/thing_0/shadow/update'
+  python elf.py send --json-message example-shadow.json --topic '$aws/things/thing_0/shadow/update'
 ```
 **Note:** The quotes around the `--topic` value are important, otherwise the `$aws` portion of the value will possibly be interpreted as a shell variable.
 
+#### Subscribe to Topic(s)
+Using the `subscribe` command will invoke the [`subscribe(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L400) function with the given command line arguments. 
+
+To subscribe to messages at the default topic root of `elf` for a specified duration, type:
+```
+  python elf.py subscribe --duration <num_seconds>
+```
+
+To subscribe to messages at the default topic root of `elf` for a specified duration, type:
+```
+  python elf.py --region <region_name> subscribe --duration <num_seconds>
+```
+
+To send messages from ELF Y to ELF X through the AWS IoT service, open two command line windows (aka. ELF X and ELF Y). In the **ELF X** window, type:
+```
+  python elf.py subscribe --duration 30
+```
+...and in the **ELF Y** window, type:
+```
+  python elf.py send --duration 15
+```
+...which, in a matter of seconds, will result in messages shown in the ELF X window similar to this example output:
+```
+...iot-elf:INFO - Received message: {"msg": "IoT ELF Hello", "ts": "1468604633.27"} from topic: elf/thing_0
+...iot-elf:INFO - Received message: {"msg": "IoT ELF Hello", "ts": "1468604634.27"} from topic: elf/thing_0
+...iot-elf:INFO - Received message: {"msg": "IoT ELF Hello", "ts": "1468604635.28"} from topic: elf/thing_0
+```
+
 #### Clean Thing(s)
-<<<<<<< HEAD
 Using the `clean` command will invoke the [`clean_up(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L426) function with the given command line arguments. This will remove all resources that were created by ELF in the AWS IoT service and on the local file system. 
-=======
-Using the `clean` command will invoke the [`clean_up(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L447) function with the given command line arguments. This will remove all resources that were created by ELF in the AWS IoT service and on the local file system.
->>>>>>> e3db095222b70e22aec0b05cbe7232c07e519d74
 
 To clean up all previously created resources, type:
 ```
-(venv)$ python elf.py clean
+  python elf.py clean
 ```
 
 If you want to force only a clean up of the locally stored files, **without cleaning** the resources created in the AWS IoT service, type:
 ```
-(venv)$ python elf.py clean --only-local
+  python elf.py clean --only-local
 ```
 
 When looking through the `clean_up(cli)` function, the core of the `clean` command is shown in these lines of code:
@@ -244,11 +268,11 @@ All steps prior to `delete_thing` are required, in order to detach and clean up 
 #### Help
 For additional detailed help and configuration options, enter:
 ```
-(venv)$ python elf.py --help
+  python elf.py --help
 ..or..
-(venv)$ python elf.py create --help
-(venv)$ python elf.py send --help
-(venv)$ python elf.py clean --help
+  python elf.py create --help
+  python elf.py send --help
+  python elf.py clean --help
 ```
 
 ## Troubleshooting
