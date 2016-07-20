@@ -286,6 +286,15 @@ elf.py: error: unrecognized arguments: --region us-east-1
 
 **A:** This example error is caused when using the ELF Command Line because the order of the commands and options matters. The general structure of all ELF commands are: `python elf.py [global-elf-options] <command> [command-specific-options]`.  The `[global-elf-options]` should be the same across commands. The `[command-specific-options]` are specific to any given command. You can learn more about the various options by getting detailed help on the command line.
 
+**Q:** I see an UNKNOWN_PROTOCOL error similar to the following. Why?
+```
+File "..snip../python2.7/ssl.py", line 808, in do_handshake
+    self._sslobj.do_handshake()
+ssl.SSLError: [SSL: UNKNOWN_PROTOCOL] unknown protocol
+```
+
+**A:** The Python installation in use does not support [TLSv1_2](https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_1.2)) which is required by the AWS IoT service. Upgrade the Python installation to 2.7.11+.
+
 **Q:** I seem to need to upgrade my `openssl` and `python` installations. Why?
 
 **A:** A version of [Python 2.7 ssl](https://docs.python.org/2/library/ssl.html) with support for Open SSL 1.0.1 is necessary to support the security posture (and specifically [TLSv1_2](https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_1.2)) required by the AWS IoT service.
