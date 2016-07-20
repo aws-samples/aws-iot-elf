@@ -293,7 +293,7 @@ File "..snip../python2.7/ssl.py", line 808, in do_handshake
 ssl.SSLError: [SSL: UNKNOWN_PROTOCOL] unknown protocol
 ```
 
-**A:** The Python installation in use does not support [TLSv1_2](https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_1.2)) which is required by the AWS IoT service. Upgrade the Python installation to 2.7.11+.
+**A:** The Python installation in use does not support [TLSv1_2](https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_1.2) which is required by the AWS IoT service. Upgrade the Python installation to 2.7.11+.
 
 **Q:** I seem to need to upgrade my `openssl` and `python` installations. Why?
 
