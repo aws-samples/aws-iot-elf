@@ -22,3 +22,14 @@ A few more notes to get started with your ELF Docker image:
 ```python /root/aws-iot-elf/elf.py COMMAND```
 
 You now have the necessary development commands configured in your ELF Docker image. Continue on and finish the rest of the non-specific [Getting Started](../master/README.md).
+
+
+## Troubleshooting
+**Q:** When running native Docker on Mac the signeture time expired. This is the error message: 
+``` 
+raise ClientError(parsed_response, operation_name)
+botocore.exceptions.ClientError: An error occurred (InvalidSignatureException) when calling the CreateKeysAndCertificate operation: Signature expired: 20160721T024247Z is now earlier than 20160721T184649Z (20160721T185149Z - 5 min.)
+```
+
+**A:** This issue is listed [here]( http://stackoverflow.com/questions/22800624/will-docker-container-auto-sync-time-with-the-host-machine), to resolve restart Docker daemon, see Docker icon on the top-right corner. Restarting the container does not resolve the issue.
+
