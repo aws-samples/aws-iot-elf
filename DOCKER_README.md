@@ -11,6 +11,7 @@ RUN aws configure set aws_secret_access_key YOUR_AWS_SECRET_KEY # provide aws se
 RUN aws configure set default.region YOUR_AWS_REGION # provide aws default region
 RUN git clone https://github.com/awslabs/aws-iot-elf /root/aws-iot-elf
 RUN pip install -r /root/aws-iot-elf/requirements.txt
+RUN curl -o /root/aws-iot-elf/aws-iot-rootCA.crt https://www.symantec.com/content/en/us/enterprise/verisign/roots/VeriSign-Class%203-Public-Primary-Certification-Authority-G5.pem
 CMD /bin/bash
 ```
 
