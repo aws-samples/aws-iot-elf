@@ -204,7 +204,7 @@ To subscribe to messages at the default topic root of `elf` for a specified dura
   python elf.py subscribe --duration <num_seconds>
 ```
 
-To subscribe to messages at the default topic root of `elf` for a specified duration, type:
+To subscribe to messages at the default topic root of `elf` for a specified duration in another region, type:
 ```
   python elf.py --region <region_name> subscribe --duration <num_seconds>
 ```
