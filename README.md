@@ -123,7 +123,7 @@ The AWS IoT ELF uses the following defaults:
 - topic subscription duration: `10 seconds`
 
 #### Create Thing(s)
-Using the `clean` command will invoke the [`create_things(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L331) function with the given command line arguments.
+Using the `create` command will invoke the [`create_things(cli)`](https://github.com/awslabs/aws-iot-elf/blob/master/elf.py#L331) function with the given command line arguments.
 
 To create a given number of Things (eg. `3`) in the AWS IoT service in a specific region, type:
 ```
