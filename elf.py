@@ -206,7 +206,7 @@ class ElfThread(threading.Thread):
         self.thing_name = thing_name
         self.thing = thing
         self.root_cert = cli.root_cert
-        self.topic = '{0}/{1}'.format(cli.topic, self.thing_name)
+        self.topic = cli.topic # do not append thing name to topic for shadow update 
 
         self.region = cli.region
         self.cfg = cfg
@@ -279,7 +279,7 @@ class ElfPoster(ElfThread):
         while finish > datetime.datetime.now():
             time.sleep(1)  # wait a second between publishing iterations
             msg = {
-                "ts": "{0}".format(time.time()),
+            #    "ts": "{0}".format(time.time()),  # ts insertion is not compatible when message is send to update the device shadow 
             }
             if self.json_message is None:
                 msg['msg'] = "{0}".format(self.message)
