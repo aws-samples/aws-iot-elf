@@ -1,7 +1,7 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 
-# Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not
 # use this file except in compliance with the License. A copy of the License is
@@ -14,16 +14,13 @@
 # permissions and limitations under the License.
 
 import os
-import ssl
 import json
 import time
 import uuid
-import boto3
 import logging
 import argparse
 import datetime
 import threading
-from argparse import RawTextHelpFormatter
 from boto3.session import Session
 from botocore.exceptions import ClientError
 from random import choice
@@ -67,7 +64,7 @@ def certs_exist():
     files = os.listdir(path)
     if thing_name_template.format(0) + ".pem" in files:
         # if certs created previously there will always be a zero'th pem file
-        log.info("Previoulsy created certs exist. Please 'clean' before creating.")
+        log.info("Previously created certs exist. Please 'clean' before creating.")
         return True
 
     return False
@@ -105,14 +102,14 @@ def _update_elf_config(cfg):
         except OSError as ose:
             log.error("Error creating directory:{0} {1}".format(dirname, ose))
             log.error("Tring to create directory: {0} again".format(dirname))
-            os.makedirs(directory)
+            os.makedirs(dirname)
 
     filename = os.getcwd() + '/' + elf_file_dir + '/' + elf_file
     try:
         with open(filename, "w") as out_file:
             json.dump(cfg, out_file)
             log.debug("Wrote ELF config to file: {0}".format(cfg))
-    except OSError:
+    except OSError as ose:
         log.error('OSError while writing ELF config file. {0}'.format(ose))
 
 
@@ -206,7 +203,10 @@ class ElfThread(threading.Thread):
         self.thing_name = thing_name
         self.thing = thing
         self.root_cert = cli.root_cert
-        self.topic = cli.topic # do not append thing name to topic for shadow update 
+        if cli.append_thing_name:
+            self.topic = '{0}/{1}'.format(cli.topic, self.thing_name)
+        else:
+            self.topic = cli.topic
 
         self.region = cli.region
         self.cfg = cfg
@@ -231,11 +231,11 @@ class ElfThread(threading.Thread):
             self.policy_arn = thing[policy_arn_key]
 
         # setup MQTT client
-        elf_id = uuid.UUID(cfg[elf_id_key])
+        eid = uuid.UUID(cfg[elf_id_key])
 
         # use ELF ID and a random string since we must use unique Client ID per
         # client.
-        cid = elf_id.urn.split(":")[2] + "_" + make_string(3)
+        cid = eid.urn.split(":")[2] + "_" + make_string(3)
 
         self.mqttc = AWSIoTMQTTClient(clientID=cid)
 
@@ -279,7 +279,6 @@ class ElfPoster(ElfThread):
         while finish > datetime.datetime.now():
             time.sleep(1)  # wait a second between publishing iterations
             msg = {
-            #    "ts": "{0}".format(time.time()),  # ts insertion is not compatible when message is send to update the device shadow 
             }
             if self.json_message is None:
                 msg['msg'] = "{0}".format(self.message)
@@ -288,10 +287,10 @@ class ElfPoster(ElfThread):
 
             # publish a JSON equivalent of this Thing's message with a
             # timestamp
-            send = json.dumps(msg, separators=(', ', ': '))
+            s = json.dumps(msg, separators=(', ', ': '))
             log.info("ELF {0} posted a {1} bytes message: {2} on topic: {3}".format(
-                self.thing_name, len(send.encode("utf8")), send, self.topic))
-            self.mqttc.publish(self.topic, send, self.message_qos)
+                self.thing_name, len(s.encode("utf8")), s, self.topic))
+            self.mqttc.publish(self.topic, s, self.message_qos)
 
 
 class ElfListener(ElfThread):
@@ -316,7 +315,7 @@ class ElfListener(ElfThread):
 
 def _init(cli):
     # Initialize local configuration file and ELF's unique ID
-    elf_id = None
+    global elf_id
     elf = _get_elf_config()
     if elf:
         elf_id = uuid.UUID(elf[elf_id_key])
@@ -528,8 +527,8 @@ def clean_up(cli):
                         policyName=thing[policy_name_key],
                         principal=thing['certificateArn']
                     )
-                    # Next, use the DeletePolicy API to delete the policy from the
-                    # service
+                    # Next, use the DeletePolicy API to delete the policy from
+                    # the service
                     log.debug('[clean_up] deleting policy:{0}'.format(
                         thing[policy_name_key]))
                     iot.delete_policy(
@@ -554,8 +553,8 @@ def clean_up(cli):
                     newStatus='INACTIVE'
                 )
 
-                # Next, use the DetachThingPrincipal API to detach the Certificate from
-                # the Thing.
+                # Next, use the DetachThingPrincipal API to detach the
+                # Certificate from the Thing.
                 log.debug('[clean_up] detaching certificate:{0} from thing:{1}'.format(
                     thing['certificateArn'], thing_name))
                 iot.detach_thing_principal(
@@ -630,6 +629,9 @@ if __name__ == '__main__':
                       help="The root certificate for the credentials")
     send.add_argument('--topic', dest='topic', default=DEFAULT_TOPIC,
                       help='The topic to which the message will be sent.')
+    send.add_argument('--append-thing-name', dest='append_thing_name',
+                      default=False, action='store_true',
+                      help='Include the thing name in the topic.')
     send.add_argument(
         '--duration', dest='duration', type=int, default=10,
         help='The messages will be sent once a second for <duration> seconds.')
@@ -647,6 +649,9 @@ if __name__ == '__main__':
         help="The root certificate for the credentials")
     subs.add_argument('--topic', dest='topic', default=DEFAULT_TOPIC,
                       help='The topic on which to subscribe.')
+    subs.add_argument('--append-thing-name', dest='append_thing_name',
+                      default=False, action='store_true',
+                      help='Include the thing name in the topic.')
     subs.add_argument(
         '--duration', dest='duration', type=int, default=10,
         help='The subscription will listen on the topic for <duration> seconds.')
