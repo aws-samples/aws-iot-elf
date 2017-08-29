@@ -182,9 +182,10 @@ To send a specific message on a specific topic for a specified duration in anoth
 
 To send a JSON payload as a message read from a file named `example.json`, type:
 ```
-  python elf.py --region <region_name> send --json-message example.json
+  python elf.py --region <region_name> send --json-message example.json --append-thing-name
 ```
-...which will result in messages being sent as shown in the example output:
+...which will result in messages similar to the following, sent as shown in the 
+example output:
 ```
 ...iot-elf:INFO - ELF thing_0 posting message:'{'some': 'thing', 'another': 'thing', 'ts': '1465257133.82'}' on topic: elf/thing_0
 ...iot-elf:INFO - ELF thing_0 posting message:'{'some': 'thing', 'another': 'thing', 'ts': '1465257134.82'}' on topic: elf/thing_0
