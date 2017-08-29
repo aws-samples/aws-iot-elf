@@ -212,11 +212,11 @@ To subscribe to messages at the default topic root of `elf` for a specified dura
 
 To send messages from ELF Y to ELF X through the AWS IoT service, open two command line windows (aka. ELF X and ELF Y). In the **ELF X** window, type:
 ```
-  python elf.py subscribe --duration 30
+  python elf.py subscribe --duration 30 --append-thing-name
 ```
 ...and in the **ELF Y** window, type:
 ```
-  python elf.py send --duration 15
+  python elf.py send --duration 15 --append-thing-name
 ```
 ...which, in a matter of seconds, will result in messages shown in the **ELF X** window similar to this example output:
 ```
