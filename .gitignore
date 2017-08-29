@@ -41,6 +41,7 @@ Thumbs.db
 venv
 misc
 bin
+.idea
 
 # Things that should never leave #
 ##################################
